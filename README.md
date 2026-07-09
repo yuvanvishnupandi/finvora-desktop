@@ -1,21 +1,19 @@
-# 💎 Finvora - Next-Gen Personal Finance AI
+# 💎 Finvora - Finance Tracker
 
 ![Banner](https://img.shields.io/badge/Finance-Tracker-blue?style=for-the-badge&logo=java) ![JavaFX](https://img.shields.io/badge/JavaFX-Modern%20UI-orange?style=for-the-badge) ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-Backend-brightgreen?style=for-the-badge)
 
-Welcome to **Finvora** (or perhaps *Vaultra, AetherWealth, or NexaFinance*? See name ideas below!). 
-
-Finvora isn't just an expense tracker—it is an **elite, ultra-resilient financial AI assistant** packaged into a stunning desktop application. Built with a modern Java tech stack, it provides users with an intuitive, seamless experience for tracking wealth, setting savings goals, and interacting with bleeding-edge AI models.
+Welcome to **Finvora**, an elite personal finance desktop application. Built with a modern Java tech stack, it provides an intuitive, seamless experience for tracking wealth, setting savings goals, and interacting with bleeding-edge AI models.
 
 ---
 
-## ✨ Epic Features
+## ✨ Features
 
-- 🧠 **Multi-LLM Fallback Engine**: Never experience downtime. Chat seamlessly with your AI advisor powered by a resilient engine that routes between **Gemini, Mistral, and OpenAI**.
-- 🎙️ **Voice-Activated Logging**: "I spent $50 on food just now." The AI intent router instantly parses your voice, grabs the exact time, and logs the transaction. 
-- 📸 **AI Receipt Scanner**: Upload JPEG or PDF receipts and watch the AI extract transaction names, amounts, and dates with zero manual entry.
-- 🎨 **Glassmorphic Dual Themes**: Switch between a sleek, vibrant dark mode and a crisp, clean light mode.
-- 📊 **Dynamic Budgeting & Goals**: Set up custom savings goals (e.g., "Manali Trip") and monitor progress with real-time visual progress bars.
-- 🕒 **Precision Time Tracking**: Advanced TimePicker UI allows you to log exactly when transactions happen, not just the day.
+- **Multi-LLM AI Fallback Engine**
+- **Voice-Activated AI Logging**
+- **AI Receipt Scanner**
+- **Dynamic Budgeting & Savings Goals**
+- **Precision Time & Date Tracking**
+- **PDF Report Generation**
 
 ---
 
@@ -47,10 +45,8 @@ graph TD
     end
 
     %% External APIs
-    subgraph External [External LLM Providers]
-        Gemini[Google Gemini API]
-        Mistral[Mistral API]
-        OpenAI[OpenAI API]
+    subgraph External [External AI API Providers]
+        APIKey[AI API Keys]
     end
 
     %% Server Side
@@ -69,9 +65,7 @@ graph TD
     end
 
     %% Connections
-    Router -- Fallback Logic --> Gemini
-    Router -- Fallback Logic --> Mistral
-    Router -- Fallback Logic --> OpenAI
+    Router -- Fallback Logic --> APIKey
     
     Controllers -- HTTP / JSON --> REST
     Data <--> H2
@@ -84,19 +78,19 @@ graph TD
 
 ---
 
-## 🛠 Tech Stack Details
+## 🛠 Tech Stack
 
-### The Frontend (Client)
-- **JavaFX**: High-performance UI rendering, programmatic layouts (no FXML), and CSS styling.
-- **Maven**: Build automation and dependency management.
-- **Gson**: Lightweight, blazing-fast JSON parsing and serialization.
-- **Apache PDFBox**: Beautiful PDF report generation.
-- **JavaFX MediaPlayer**: Audio playback for AI text-to-speech.
+### Frontend (Client)
+- **JavaFX**
+- **Maven**
+- **Gson**
+- **Apache PDFBox**
+- **JavaFX MediaPlayer**
 
-### The Backend (Server)
-- **Spring Boot (Java 17)**: Rapid REST API framework.
-- **Spring Data JPA & Hibernate**: ORM and database interactions.
-- **H2 Database**: Embedded, file-based relational database for rapid, lightweight persistence.
+### Backend (Server)
+- **Spring Boot (Java 17)**
+- **Spring Data JPA & Hibernate**
+- **H2 Database**
 
 ---
 
@@ -107,19 +101,18 @@ graph TD
 - Maven 3.9+
 
 ### 1. Boot up the Backend Server
+Open a terminal window and run the background server logic:
 ```powershell
 cd expense-tracker-springboot-server
 mvn spring-boot:run
 ```
-*(The server will start on http://localhost:8080)*
 
-### 2. Launch the Desktop Client
-Open a new terminal window:
+### 2. Launch the Desktop Application
+Open a new terminal window and launch the user interface:
 ```powershell
 cd expense-tracker-client
 mvn compile javafx:run
 ```
-*(Register a new user and enjoy!)*
 
 ---
 
