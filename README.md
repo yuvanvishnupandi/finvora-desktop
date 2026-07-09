@@ -1,4 +1,4 @@
-# Finvora - Finance Tracker
+# Finvora - AI Finanace Manager
 
 ![Finvora Dashboard](assets/dashboard.png)
 
