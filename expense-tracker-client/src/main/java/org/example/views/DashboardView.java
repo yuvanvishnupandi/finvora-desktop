@@ -1,4 +1,3 @@
-// File: expense-tracker-client/src/main/java/org/example/views/DashboardView.java
 package org.example.views;
 
 import javafx.application.Platform;
@@ -16,10 +15,12 @@ import org.example.models.MonthlyFinance;
 import org.example.utils.Utilitie;
 import org.example.utils.ViewNavigator;
 import org.example.utils.ThemeManager; 
+import org.example.services.AIVoiceService;
 
 import java.math.BigDecimal;
 import java.time.Year;
 import java.util.Objects;
+import javafx.collections.FXCollections;
 
 public class DashboardView {
 
@@ -35,19 +36,16 @@ public class DashboardView {
 
     private Label userNameLabel, userEmailLabel;
     private ImageView userIcon;
-    
-    // ADDED: Theme Toggle Button
     private ToggleButton themeToggle; 
-    private VBox mainContent; // ADDED: Reference to the VBox holding the main background
+    private javafx.scene.layout.HBox mainContent; 
 
     private ComboBox<Integer> yearComboBox;
     private ComboBox<String> monthQuarterComboBox;
 
-    private Button addTransactionButton, viewChartButton;
+    public Button addTransactionButton, viewChartButton, scanReceiptButton;
     private VBox recentTransactionBox;
     private MenuBar menuBar;
 
-    // Menu Item Fields
     private MenuItem createCategoryMenuItem, viewCategoriesMenuItem, logoutMenuItem;
     private MenuItem exportDataMenuItem;
     private MenuItem generatePdfReportMenuItem;
@@ -55,15 +53,21 @@ public class DashboardView {
     private MenuItem viewBudgetProgressMenuItem;
     private MenuItem addGoalMenuItem;
     private MenuItem viewGoalsMenuItem;
-    private MenuItem aboutUsMenuItem; // ADDED: About Us menu item
+    private MenuItem aboutUsMenuItem; 
 
-    // NEW: currency converter menu item
     private MenuItem convertCurrencyMenuItem;
 
     private TableView<MonthlyFinance> transactionTable;
+    public Button aiAlertsButton;
     private TableColumn<MonthlyFinance, String> monthColumn;
     private TableColumn<MonthlyFinance, BigDecimal> incomeColumn;
     private TableColumn<MonthlyFinance, BigDecimal> expenseColumn;
+
+    private ToggleButton listenBtn;
+    private Label aiStatusLabel;
+    private TextArea aiAdviceArea;
+    private TextField chatInput;
+    private Button sendBtn;
 
     public DashboardView(String email) {
         this.email = email;
@@ -80,6 +84,7 @@ public class DashboardView {
         totalIncome = new Label("₹0.00");
         totalExpense = new Label("₹0.00");
         addTransactionButton = new Button("+");
+        scanReceiptButton = new Button("📷 Scan");
 
         monthQuarterComboBox = new ComboBox<>();
 
@@ -90,22 +95,22 @@ public class DashboardView {
 
         userIcon = createUserIcon();
         
-        // ADDED: Initialize Theme Toggle
         themeToggle = new ToggleButton(); 
         themeToggle.getStyleClass().add("theme-toggle");
         
         createCategoryMenuItem = new MenuItem("Add Category");
         viewCategoriesMenuItem = new MenuItem("View Categories");
         exportDataMenuItem = new MenuItem("Export Data (CSV)");
+        aiAlertsButton = new Button("🔔 AI Alerts (0)");
+        aiAlertsButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #111; -fx-font-weight: bold; -fx-cursor: hand;");
         generatePdfReportMenuItem = new MenuItem("Generate PDF Report");
         logoutMenuItem = new MenuItem("Logout");
         setMonthlyBudgetsMenuItem = new MenuItem("Set Monthly Budgets");
         viewBudgetProgressMenuItem = new MenuItem("View Budget Progress");
         addGoalMenuItem = new MenuItem("Add Goal");
         viewGoalsMenuItem = new MenuItem("View Goals");
-        aboutUsMenuItem = new MenuItem("About Us"); // ADDED: About Us menu item
+        aboutUsMenuItem = new MenuItem("About Us"); 
         
-        // NEW: Initialize the Currency Converter Menu Item
         convertCurrencyMenuItem = new MenuItem("Convert Currency...");
 
         yearComboBox = new ComboBox<>();
@@ -130,36 +135,20 @@ public class DashboardView {
         }
     }
 
+    private ToggleButton voiceBtn;
+
     public void show() {
         Scene scene = createScene();
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm());
         
-        // --- ADDED THEME LOGIC ---
-        // 1. Initial State: Start in Dark Mode
-        ThemeManager.setDark(true); 
+        VBox rootVBox = (VBox) ((StackPane) scene.getRoot()).getChildren().get(0);
         
-        // 2. Apply initial background class based on state
-        mainContent.getStyleClass().add(ThemeManager.isDark() ? "main-background-dark" : "main-background-light");
-        themeToggle.setText(ThemeManager.isDark() ? "🌙 Dark" : "☀ Light");
-        themeToggle.setSelected(ThemeManager.isDark());
+        rootVBox.getStyleClass().removeAll("main-background", "main-background-dark");
+        rootVBox.getStyleClass().add("main-background-light");
+        themeToggle.setVisible(false);
+        themeToggle.setManaged(false);
         
-        // 3. Listener to switch ONLY the main background class
-        themeToggle.selectedProperty().addListener((obs, oldV, isDark) -> {
-            ThemeManager.setDark(isDark);
-            if (isDark) {
-                // Switch to Dark
-                mainContent.getStyleClass().removeAll("main-background-light");
-                mainContent.getStyleClass().add("main-background-dark");
-                themeToggle.setText("🌙 Dark");
-            } else {
-                // Switch to Light (White background)
-                mainContent.getStyleClass().removeAll("main-background-dark");
-                mainContent.getStyleClass().add("main-background-light");
-                themeToggle.setText("☀ Light");
-            }
-        });
-        // --- END ADDED THEME LOGIC ---
-        
+        ThemeManager.apply(scene);       
         new DashboardController(this);
         scene.widthProperty().addListener((observable, oldVal, newVal) -> {
             loadingAnimationPane.resizeWidth(newVal.doubleValue());
@@ -171,86 +160,76 @@ public class DashboardView {
     }
 
     private Scene createScene() {
-        menuBar = createMenuBar();
-
         StackPane rootStack = new StackPane();
-        mainContent = new VBox(); // Assigned to class field
-        // mainContent.getStyleClass().add("main-background"); // Removed standard class here
+        
+        VBox rootVBox = new VBox();
+        rootVBox.getStyleClass().add("main-background");
+        
+        javafx.scene.layout.HBox topMenuBar = createTopMenuBar();
 
-        HBox topBar = buildTopBar();
+        mainContent = new javafx.scene.layout.HBox();
+        VBox.setVgrow(mainContent, Priority.ALWAYS);
+        mainContent.setStyle("-fx-background-color: transparent;");
 
         VBox mainContainerWrapper = new VBox();
         mainContainerWrapper.getStyleClass().add("dashboard-padding");
         VBox.setVgrow(mainContainerWrapper, Priority.ALWAYS);
+        HBox.setHgrow(mainContainerWrapper, Priority.ALWAYS);
+        
         HBox balanceSummaryBox = createBalanceSummaryBox();
         GridPane contentGridPane = createContentGridPane();
         VBox.setVgrow(contentGridPane, Priority.ALWAYS);
         mainContainerWrapper.getChildren().addAll(balanceSummaryBox, contentGridPane);
 
-        mainContent.getChildren().addAll(topBar, mainContainerWrapper);
-        rootStack.getChildren().addAll(mainContent, loadingAnimationPane);
+        ScrollPane scrollPane = new ScrollPane(mainContainerWrapper);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        HBox.setHgrow(scrollPane, Priority.ALWAYS);
+        scrollPane.setStyle("-fx-background-color: transparent;");
+
+        mainContent.getChildren().add(scrollPane);
+        rootVBox.getChildren().addAll(topMenuBar, mainContent);
+        
+        rootStack.getChildren().addAll(rootVBox, loadingAnimationPane);
 
         return new Scene(rootStack, Utilitie.APP_WIDTH, Utilitie.APP_HEIGHT);
     }
 
-    private HBox buildTopBar() {
-        HBox topBarContent = new HBox();
-        topBarContent.setAlignment(Pos.CENTER_LEFT);
-        topBarContent.setSpacing(10);
-        topBarContent.setPadding(new Insets(6, 10, 6, 10));
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        VBox userDetailBox = new VBox(0, userNameLabel, userEmailLabel);
-        userDetailBox.setAlignment(Pos.CENTER_RIGHT);
-
-        HBox userBox = new HBox(6, userIcon, userDetailBox);
-        userBox.setAlignment(Pos.CENTER_RIGHT);
-
-        // ADDED: Combine Theme Toggle and User Info
-        HBox rightControls = new HBox(10, themeToggle, userBox);
-        rightControls.setAlignment(Pos.CENTER_RIGHT);
-
-        topBarContent.getChildren().addAll(menuBar, spacer, rightControls); // Use rightControls
-
-        HBox fullWidthBar = new HBox(topBarContent);
-        fullWidthBar.getStyleClass().add("top-bar-background");
-        HBox.setHgrow(topBarContent, Priority.ALWAYS);
-
-        return fullWidthBar;
-    }
-
-    private MenuBar createMenuBar() {
+    private javafx.scene.layout.HBox createTopMenuBar() {
         MenuBar menuBar = new MenuBar();
-        menuBar.setStyle("-fx-background-color: transparent;");
-        menuBar.getStyleClass().remove("top-menu");
+        menuBar.setStyle("-fx-background-color: transparent; -fx-padding: 5px;");
 
-        Menu categoryMenu = new Menu("Category");
+        Menu categoryMenu = new Menu("Categories");
         categoryMenu.getItems().addAll(createCategoryMenuItem, viewCategoriesMenuItem);
 
-        Menu savingsMenu = new Menu("Savings");
+        Menu savingsMenu = new Menu("Savings Goals");
         savingsMenu.getItems().addAll(addGoalMenuItem, viewGoalsMenuItem);
 
-        Menu budgetMenu = new Menu("Budget");
+        Menu budgetMenu = new Menu("Budgets");
         budgetMenu.getItems().addAll(setMonthlyBudgetsMenuItem, viewBudgetProgressMenuItem);
 
-        Menu exportMenu = new Menu("Export Data");
+        Menu exportMenu = new Menu("Export / Reports");
         exportMenu.getItems().addAll(exportDataMenuItem, generatePdfReportMenuItem);
 
-        // NEW Currency menu before Logout
-        Menu currencyMenu = new Menu("Currency");
+        Menu currencyMenu = new Menu("Currency Convert");
         currencyMenu.getItems().add(convertCurrencyMenuItem);
+        
+        Menu systemMenu = new Menu("System");
+        systemMenu.getItems().addAll(aboutUsMenuItem, logoutMenuItem);
 
-        Menu helpMenu = new Menu("Help"); // ADDED Help Menu
-        helpMenu.getItems().add(aboutUsMenuItem);
-
-        Menu logoutMenu = new Menu("Logout");
-        logoutMenu.getItems().add(logoutMenuItem);
-
-        // ADDED helpMenu to the menuBar list
-        menuBar.getMenus().addAll(categoryMenu, savingsMenu, budgetMenu, exportMenu, currencyMenu, helpMenu, logoutMenu);
-        return menuBar;
+        menuBar.getMenus().addAll(categoryMenu, savingsMenu, budgetMenu, exportMenu, currencyMenu, systemMenu);
+        
+        javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
+        javafx.scene.layout.HBox.setHgrow(spacer, Priority.ALWAYS);
+        
+        themeToggle.setStyle("-fx-background-color: transparent; -fx-text-fill: #D4D4D4; -fx-cursor: hand; -fx-font-weight: bold;");
+        
+        javafx.scene.layout.HBox topBar = new javafx.scene.layout.HBox(menuBar, spacer, aiAlertsButton, themeToggle);
+        topBar.getStyleClass().add("top-bar-background");
+        topBar.setAlignment(Pos.CENTER_LEFT);
+        topBar.setPadding(new javafx.geometry.Insets(0, 15, 0, 0));
+        
+        return topBar;
     }
 
     private HBox createBalanceSummaryBox() {
@@ -259,42 +238,42 @@ public class DashboardView {
         statBox.setStyle("-fx-padding: 20 0 40 0;");
 
         VBox balanceCard = new VBox(10);
-        balanceCard.getStyleClass().add("stat-card");
+        balanceCard.getStyleClass().addAll("stat-card", "card-balance");
         currentBalanceLabel.getStyleClass().setAll("stat-label");
         currentBalance.getStyleClass().setAll("stat-amount");
         balanceCard.getChildren().addAll(currentBalanceLabel, currentBalance);
         HBox.setHgrow(balanceCard, Priority.ALWAYS);
 
         VBox incomeCard = new VBox(10);
-        incomeCard.getStyleClass().add("stat-card");
+        incomeCard.getStyleClass().addAll("stat-card", "card-income");
         totalIncomeLabel.getStyleClass().setAll("stat-label");
         totalIncome.getStyleClass().setAll("stat-amount");
         incomeCard.getChildren().addAll(totalIncomeLabel, totalIncome);
         HBox.setHgrow(incomeCard, Priority.ALWAYS);
 
         VBox expenseCard = new VBox(10);
-        expenseCard.getStyleClass().add("stat-card");
+        expenseCard.getStyleClass().addAll("stat-card", "card-expense");
         totalExpenseLabel.getStyleClass().setAll("stat-label");
         totalExpense.getStyleClass().setAll("stat-amount");
         expenseCard.getChildren().addAll(totalExpenseLabel, totalExpense);
         HBox.setHgrow(expenseCard, Priority.ALWAYS);
 
         VBox budgetCard = new VBox(10);
-        budgetCard.getStyleClass().add("stat-card");
+        budgetCard.getStyleClass().addAll("stat-card", "card-budget");
         budgetStatusLabel.getStyleClass().setAll("stat-label");
         budgetRemaining.getStyleClass().setAll("stat-amount");
         budgetCard.getChildren().addAll(budgetStatusLabel, budgetRemaining);
         HBox.setHgrow(budgetCard, Priority.ALWAYS);
 
         VBox topGoalCard = new VBox(8);
-        topGoalCard.getStyleClass().add("stat-card");
+        topGoalCard.getStyleClass().addAll("stat-card", "card-savings");
         Label topGoalLabel = new Label("Savings Progress:");
         topGoalLabel.getStyleClass().add("stat-label");
-        // FIX: The text is now set by the controller based on the actual goal status
-        Label topGoalNameLabel = new Label("Check Savings Menu"); 
+        topGoalNameLabel = new Label("Check Savings Menu"); 
         topGoalNameLabel.getStyleClass().add("stat-amount");
         topGoalProgressBar = new ProgressBar(0.0);
         topGoalProgressBar.setPrefWidth(200);
+        topGoalProgressBar.getStyleClass().add("progress-bar");
         topGoalCard.getChildren().addAll(topGoalLabel, topGoalNameLabel, topGoalProgressBar);
         HBox.setHgrow(topGoalCard, Priority.ALWAYS);
 
@@ -305,23 +284,39 @@ public class DashboardView {
     private GridPane createContentGridPane() {
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
-        ColumnConstraints columnConstraint = new ColumnConstraints();
-        columnConstraint.setPercentWidth(50);
-        gridPane.getColumnConstraints().addAll(columnConstraint, columnConstraint);
+        gridPane.setMinWidth(0); 
+
+        ColumnConstraints leftCol = new ColumnConstraints();
+        leftCol.setPercentWidth(55);
+        leftCol.setMinWidth(0);
+        
+        ColumnConstraints rightCol = new ColumnConstraints();
+        rightCol.setPercentWidth(45);
+        rightCol.setMinWidth(0);
+        
+        gridPane.getColumnConstraints().addAll(leftCol, rightCol);
         VBox transactionsTableSummaryBox = new VBox(20);
+        transactionsTableSummaryBox.setMinWidth(0);
 
         HBox filterAndChartButtonBox = createFilterAndChartButtonBox();
 
         VBox transactionTableContentBox = createTransactionsTableContentBox();
         VBox.setVgrow(transactionTableContentBox, Priority.ALWAYS);
+        transactionTableContentBox.setMinWidth(0);
 
         transactionsTableSummaryBox.getChildren().addAll(filterAndChartButtonBox, transactionTableContentBox);
 
         VBox recentTransactionsVBox = createRecentTransactionsVBox();
         recentTransactionsVBox.getStyleClass().addAll("field-background", "rounded-border", "padding-10px");
         GridPane.setVgrow(recentTransactionsVBox, Priority.ALWAYS);
+        recentTransactionsVBox.setMinWidth(0);
+        
+        VBox rightColumn = new VBox(10, createAIVoicePlannerPanel(), recentTransactionsVBox);
+        GridPane.setVgrow(rightColumn, Priority.ALWAYS);
+        rightColumn.setMinWidth(0);
+
         gridPane.add(transactionsTableSummaryBox, 0, 0);
-        gridPane.add(recentTransactionsVBox, 1, 0);
+        gridPane.add(rightColumn, 1, 0);
         return gridPane;
     }
 
@@ -347,6 +342,7 @@ public class DashboardView {
         VBox vbox = new VBox();
         transactionTable = new TableView<>();
         VBox.setVgrow(transactionTable, Priority.ALWAYS);
+        transactionTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         
         monthColumn = new TableColumn<>("Month");
         monthColumn.setCellValueFactory(new PropertyValueFactory<>("month"));
@@ -362,25 +358,70 @@ public class DashboardView {
         
         transactionTable.getColumns().addAll(monthColumn, incomeColumn, expenseColumn);
         vbox.getChildren().add(transactionTable);
+        // We can remove resizeTableWidthColumns() calls now that CONSTRAINED_RESIZE_POLICY is used, but keeping it is fine too.
         resizeTableWidthColumns();
         return vbox;
     }
 
+    private ComboBox<String> recentFilterBox;
+
     private VBox createRecentTransactionsVBox() {
         VBox recentTransactionsVBox = new VBox();
-        HBox labelAndButtonBox = new HBox();
+        HBox labelAndButtonBox = new HBox(15);
+        labelAndButtonBox.setAlignment(Pos.CENTER_LEFT);
         Label recentTransactionsLabel = new Label("Recent Transactions");
         recentTransactionsLabel.getStyleClass().addAll("text-size-lg", "text-light-gray");
+        
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
+        scanReceiptButton.getStyleClass().addAll("field-background", "text-size-md", "text-light-gray", "rounded-border");
         addTransactionButton.getStyleClass().addAll("field-background", "text-size-md", "text-light-gray", "rounded-border");
-        labelAndButtonBox.getChildren().addAll(recentTransactionsLabel, spacer, addTransactionButton);
+        labelAndButtonBox.getChildren().addAll(recentTransactionsLabel, spacer, scanReceiptButton, addTransactionButton);
         recentTransactionBox = new VBox(10);
         ScrollPane recentTransactionsScrollPane = new ScrollPane(recentTransactionBox);
         recentTransactionsScrollPane.setFitToWidth(true);
         recentTransactionsScrollPane.setFitToHeight(true);
         recentTransactionsVBox.getChildren().addAll(labelAndButtonBox, recentTransactionsScrollPane);
         return recentTransactionsVBox;
+    }
+
+    private VBox createAIVoicePlannerPanel() {
+        VBox aiBox = new VBox(15);
+        aiBox.getStyleClass().addAll("ui-card-squircle");
+        
+        Label titleLabel = new Label("Finvora AI Assistant");
+        titleLabel.getStyleClass().addAll("text-size-lg", "text-light-gray");
+        
+        HBox headerBox = new HBox(15, titleLabel);
+        headerBox.setAlignment(Pos.CENTER_LEFT);
+        
+        chatInput = new TextField();
+        chatInput.setPromptText("Type your financial question or goal...");
+        chatInput.getStyleClass().addAll("input-field");
+        HBox.setHgrow(chatInput, Priority.ALWAYS);
+
+        sendBtn = new Button("Send");
+        sendBtn.getStyleClass().addAll("primary-button");
+        
+        voiceBtn = new ToggleButton("🎤 Voice");
+        voiceBtn.getStyleClass().addAll("toggle-button");
+        
+        HBox textInputBox = new HBox(10, chatInput, sendBtn, voiceBtn);
+        textInputBox.setAlignment(Pos.CENTER_LEFT);
+
+        aiStatusLabel = new Label("Ready.");
+        aiStatusLabel.getStyleClass().addAll("stat-label");
+
+        aiAdviceArea = new TextArea();
+        aiAdviceArea.setPromptText("Your AI advisor's strategy will appear here...");
+        aiAdviceArea.setWrapText(true);
+        aiAdviceArea.setEditable(false);
+        aiAdviceArea.setPrefRowCount(3);
+        aiAdviceArea.getStyleClass().addAll("input-field");
+
+        aiBox.getChildren().addAll(headerBox, textInputBox, aiStatusLabel, aiAdviceArea);
+
+        return aiBox;
     }
 
     private void resizeTableWidthColumns() {
@@ -415,21 +456,24 @@ public class DashboardView {
     public TableColumn<MonthlyFinance, BigDecimal> getExpenseColumn() { return expenseColumn; }
     public ComboBox<Integer> getYearComboBox() { return yearComboBox; }
     public Label getCurrentBalance() { return currentBalance; }
+    public ToggleButton getVoiceBtn() { return voiceBtn; }
     public Label getTotalIncome() { return totalIncome; }
     public Label getTotalExpense() { return totalExpense; }
     public Button getViewChartButton() { return viewChartButton; }
     public ComboBox<String> getMonthQuarterComboBox() { return monthQuarterComboBox; }
     
-    // User details getters
     public Label getUserNameLabel() { return userNameLabel; }
     public Label getUserEmailLabel() { return userEmailLabel; }
     
-    // NEW: getter for currency menu
     public MenuItem getConvertCurrencyMenuItem() { return convertCurrencyMenuItem; }
 
     public Label getTopGoalNameLabel() { return topGoalNameLabel; }
     public ProgressBar getTopGoalProgressBar() { return topGoalProgressBar; }
     
-    // ADDED: Getter for the Theme Toggle
     public ToggleButton getThemeToggle() { return themeToggle; }
+
+    public Label getAiStatusLabel() { return aiStatusLabel; }
+    public TextArea getAiAdviceArea() { return aiAdviceArea; }
+    public TextField getChatInput() { return chatInput; }
+    public Button getSendBtn() { return sendBtn; }
 }

@@ -1,4 +1,4 @@
-// File: expense-tracker-client/src/main/java/org/example/utils/CsvExportUtil.java
+
 package org.example.utils;
 
 import org.example.dialogs.ExportDataDialog;
@@ -93,7 +93,7 @@ public final class CsvExportUtil {
             bw.write("id,category,periodType,year,month,quarter,limit,spent,remaining\n");
             if (budgets != null) {
                 for (Budget b : budgets) {
-                    // refresh spent before export
+                    
                     b.setSpentAmount(SpentCalculator.compute(user, b));
                     bw.write(String.join(",",
                             String.valueOf(b.getId() == null ? 0 : b.getId()),
@@ -119,7 +119,6 @@ public final class CsvExportUtil {
         return v;
     }
 
-    // internal helper to compute budget spent from DB
     private static final class SpentCalculator {
         static java.math.BigDecimal compute(User user, Budget b) {
             if (b == null || user == null) return java.math.BigDecimal.ZERO;

@@ -1,4 +1,4 @@
-// File: expense-tracker-client/src/main/java/org/example/views/BudgetProgressView.java
+
 package org.example.views;
 
 import javafx.geometry.Insets;
@@ -64,9 +64,9 @@ public class BudgetProgressView extends Stage {
 
         setScene(new Scene(root, 900, 480));
 
-        refreshTable(); // load from store first
+        refreshTable(); 
         if (budgets != null && !budgets.isEmpty()) {
-            // ensure any passed-in budgets are shown (added to store if not present)
+            
             budgets.forEach(b -> {
                 if (BudgetStore.getById(user.getId(), b.getId()) == null) BudgetStore.add(user.getId(), b);
             });

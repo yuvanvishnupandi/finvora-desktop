@@ -16,15 +16,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SqlUtil {
-    // get
+    
     public static User getUserByEmail(String userEmail){
-        // authenticate email and password
+        
         HttpURLConnection conn = null;
         try{
+            String encodedEmail = URLEncoder.encode(userEmail, StandardCharsets.UTF_8);
             conn = ApiUtil.fetchApi(
-                    "/api/v1/user?email=" + userEmail,
+                    "/api/v1/user?email=" + encodedEmail,
                     ApiUtil.RequestMethod.GET, null
             );
+            if(conn == null) return null;
 
             if(conn.getResponseCode() != 200){
                 System.out.println("Error(getUserByEmail): " +  conn.getResponseCode());
@@ -35,7 +37,6 @@ public class SqlUtil {
 
             JsonObject jsonObject = JsonParser.parseString(userDataJson).getAsJsonObject();
 
-            // extract the json data
             int id = jsonObject.get("id").getAsInt();
             String name = jsonObject.get("name").getAsString();
             String email = jsonObject.get("email").getAsString();
@@ -61,6 +62,7 @@ public class SqlUtil {
                     "/api/v1/transaction-category/user/" + user.getId(),
                     ApiUtil.RequestMethod.GET, null
             );
+            if(conn == null) return null;
 
             if(conn.getResponseCode() != 200){
                 System.out.println("Error(getAllTransactionCategoriesByUser): " + conn.getResponseCode());
@@ -99,6 +101,7 @@ public class SqlUtil {
                     ApiUtil.RequestMethod.GET,
                     null
             );
+            if(conn == null) return null;
 
             if(conn.getResponseCode() != 200){
                 return null;
@@ -128,6 +131,10 @@ public class SqlUtil {
                 String transactionName = transactionJsonObj.get("transactionName").getAsString();
                 double transactionAmount = transactionJsonObj.get("transactionAmount").getAsDouble();
                 LocalDate transactionDate = LocalDate.parse(transactionJsonObj.get("transactionDate").getAsString());
+                String transactionTime = null;
+                if (transactionJsonObj.has("transactionTime") && !transactionJsonObj.get("transactionTime").isJsonNull()) {
+                    transactionTime = transactionJsonObj.get("transactionTime").getAsString();
+                }
                 String transactionType = transactionJsonObj.get("transactionType").getAsString();
 
                 Transaction transaction = new Transaction(
@@ -136,6 +143,7 @@ public class SqlUtil {
                         transactionName,
                         transactionAmount,
                         transactionDate,
+                        transactionTime,
                         transactionType
                 );
 
@@ -168,6 +176,7 @@ public class SqlUtil {
                     ApiUtil.RequestMethod.GET,
                     null
             );
+            if(conn == null) return null;
 
             if(conn.getResponseCode() != 200){
                 return null;
@@ -198,6 +207,10 @@ public class SqlUtil {
                 String transactionName = transactionJsonObj.get("transactionName").getAsString();
                 double transactionAmount = transactionJsonObj.get("transactionAmount").getAsDouble();
                 LocalDate transactionDate = LocalDate.parse(transactionJsonObj.get("transactionDate").getAsString());
+                String transactionTime = null;
+                if (transactionJsonObj.has("transactionTime") && !transactionJsonObj.get("transactionTime").isJsonNull()) {
+                    transactionTime = transactionJsonObj.get("transactionTime").getAsString();
+                }
                 String transactionType = transactionJsonObj.get("transactionType").getAsString();
 
                 Transaction transaction = new Transaction(
@@ -206,12 +219,12 @@ public class SqlUtil {
                         transactionName,
                         transactionAmount,
                         transactionDate,
+                        transactionTime,
                         transactionType
                 );
 
                 transactions.add(transaction);
             }
-
 
             return transactions;
         }catch (IOException e){
@@ -233,6 +246,7 @@ public class SqlUtil {
                     "/api/v1/transaction/years/" + userId,
                     ApiUtil.RequestMethod.GET, null
             );
+            if(conn == null) return null;
 
             if(conn.getResponseCode() != 200){
                 System.out.println("Error(getAllDistinctYears): " + conn.getResponseCode());
@@ -257,28 +271,30 @@ public class SqlUtil {
         return null;
     }
 
-    // post
     public static boolean postLoginUser(String email, String password){
-        // authenticate email and password
+        
         HttpURLConnection conn = null;
         try{
+            String encodedEmail = URLEncoder.encode(email, StandardCharsets.UTF_8);
+            String encodedPassword = URLEncoder.encode(password, StandardCharsets.UTF_8);
             conn = ApiUtil.fetchApi(
-                    "/api/v1/user/login?email=" + email + "&password=" + password,
+                    "/api/v1/user/login?email=" + encodedEmail + "&password=" + encodedPassword,
                     ApiUtil.RequestMethod.POST, null
             );
+            if(conn == null) return false;
 
             if(conn.getResponseCode() != 200){
                 return false;
             }
 
+            return true;
         }catch(IOException e){
             e.printStackTrace();
+            return false;
         }finally {
             if(conn != null)
                 conn.disconnect();
         }
-
-        return true;
     }
 
     public static boolean postCreateUser(JsonObject userData){
@@ -289,18 +305,19 @@ public class SqlUtil {
                     ApiUtil.RequestMethod.POST,
                     userData
             );
+            if(conn == null) return false;
 
             if(conn.getResponseCode() != 200){
-                return false; // failed to create an account
+                return false; 
             }
+            return true;
         }catch (IOException e){
             e.printStackTrace();
+            return false;
         }finally{
             if(conn != null)
                 conn.disconnect();
         }
-
-        return true; // the account was successfully created and stored into our database
     }
 
     public static boolean postTransactionCategory(JsonObject transactionCategoryData){
@@ -311,6 +328,7 @@ public class SqlUtil {
                     ApiUtil.RequestMethod.POST,
                     transactionCategoryData
             );
+            if(conn == null) return false;
 
             if(conn.getResponseCode() != 200){
                 return false;
@@ -336,6 +354,7 @@ public class SqlUtil {
                     ApiUtil.RequestMethod.POST,
                     transactionData
             );
+            if(conn == null) return false;
 
             if(conn.getResponseCode() != 200){
                 return false;
@@ -353,7 +372,6 @@ public class SqlUtil {
         return false;
     }
 
-    // update
     public static boolean putTransaction(JsonObject newTransactionData){
         HttpURLConnection conn = null;
         try{
@@ -362,6 +380,7 @@ public class SqlUtil {
                     ApiUtil.RequestMethod.PUT,
                     newTransactionData
             );
+            if(conn == null) return false;
 
             if(conn.getResponseCode() != 200){
                 System.out.println("Error(putTransaction): " + conn.getResponseCode());
@@ -392,6 +411,7 @@ public class SqlUtil {
                     ApiUtil.RequestMethod.PUT,
                     null
             );
+            if(conn == null) return false;
 
             if(conn.getResponseCode() != 200){
                 System.out.println("Error(putTransactionCategory): " + conn.getResponseCode());
@@ -410,14 +430,6 @@ public class SqlUtil {
         return false;
     }
 
-    // delete
-    /**
-     * Attempts to delete a transaction category by ID.
-     * Note: A 500 error usually means a Foreign Key constraint violation on the server, 
-     * indicating transactions are still linked to this category.
-     * @param categoryId The ID of the category to delete.
-     * @return true if deletion was successful (200), false otherwise.
-     */
     public static boolean deleteTransactionCategoryById(int categoryId){
         HttpURLConnection conn = null;
         try{
@@ -426,14 +438,14 @@ public class SqlUtil {
                     ApiUtil.RequestMethod.DELETE,
                     null
             );
+            if(conn == null) return false;
 
             int responseCode = conn.getResponseCode();
             
             if(responseCode != 200){
-                // Enhanced logging to show the actual response code
+                
                 System.out.println("Error(deleteTransactionCategoryById): " + responseCode);
                 
-                // Add a user-friendly alert for common deletion issues (like 500/409)
                 if (responseCode == 500 || responseCode == 409) {
                      new Alert(Alert.AlertType.ERROR, 
                                "Failed to delete category (Code " + responseCode + "). " +
@@ -463,6 +475,7 @@ public class SqlUtil {
                     ApiUtil.RequestMethod.DELETE,
                     null
             );
+            if(conn == null) return false;
 
             if(conn.getResponseCode() != 200){
                 System.out.println("Error(deleteTransactionById): " + conn.getResponseCode());
@@ -478,6 +491,114 @@ public class SqlUtil {
             }
         }
 
+        return false;
+    }
+
+    public static java.util.List<org.example.models.SavingsGoal> getSavingsGoals(int userId) {
+        java.util.List<org.example.models.SavingsGoal> goals = new java.util.ArrayList<>();
+        HttpURLConnection conn = null;
+        try {
+            conn = ApiUtil.fetchApi("/api/v1/savings-goals/user/" + userId, ApiUtil.RequestMethod.GET, null);
+            if (conn != null) {
+                int code = conn.getResponseCode();
+                if (code >= 200 && code < 300) {
+                    com.google.gson.JsonArray array = com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(conn.getInputStream())).getAsJsonArray();
+                    for (com.google.gson.JsonElement el : array) {
+                        com.google.gson.JsonObject obj = el.getAsJsonObject();
+                        org.example.models.SavingsGoal goal = new org.example.models.SavingsGoal(
+                            obj.get("name").getAsString(),
+                            obj.get("targetAmount").getAsBigDecimal(),
+                            obj.get("currentAmount").getAsBigDecimal(),
+                            java.time.LocalDate.parse(obj.get("deadline").getAsString())
+                        );
+                        goal.setId(obj.get("id").getAsInt());
+                        goals.add(goal);
+                    }
+                } else {
+                    System.err.println("getSavingsGoals failed with code: " + code);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (conn != null) conn.disconnect();
+        }
+        return goals;
+    }
+
+    public static org.example.models.SavingsGoal postSavingsGoal(int userId, org.example.models.SavingsGoal goal) {
+        HttpURLConnection conn = null;
+        try {
+            com.google.gson.JsonObject payload = new com.google.gson.JsonObject();
+            payload.addProperty("name", goal.getName());
+            payload.addProperty("targetAmount", goal.getTargetAmount());
+            payload.addProperty("currentAmount", goal.getCurrentAmount());
+            payload.addProperty("deadline", goal.getDeadline().toString());
+            
+            com.google.gson.JsonObject userObj = new com.google.gson.JsonObject();
+            userObj.addProperty("id", userId);
+            payload.add("user", userObj);
+            
+            conn = ApiUtil.fetchApi("/api/v1/savings-goals", ApiUtil.RequestMethod.POST, payload);
+            if (conn != null) {
+                int code = conn.getResponseCode();
+                if (code >= 200 && code < 300) {
+                    com.google.gson.JsonObject obj = com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(conn.getInputStream())).getAsJsonObject();
+                    goal.setId(obj.get("id").getAsInt());
+                    return goal;
+                } else {
+                    System.err.println("postSavingsGoal failed with code: " + code);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (conn != null) conn.disconnect();
+        }
+        return null;
+    }
+
+    public static boolean putSavingsGoal(int userId, org.example.models.SavingsGoal goal) {
+        HttpURLConnection conn = null;
+        try {
+            com.google.gson.JsonObject payload = new com.google.gson.JsonObject();
+            payload.addProperty("id", goal.getId());
+            payload.addProperty("name", goal.getName());
+            payload.addProperty("targetAmount", goal.getTargetAmount());
+            payload.addProperty("currentAmount", goal.getCurrentAmount());
+            payload.addProperty("deadline", goal.getDeadline().toString());
+            
+            com.google.gson.JsonObject userObj = new com.google.gson.JsonObject();
+            userObj.addProperty("id", userId);
+            payload.add("user", userObj);
+            
+            conn = ApiUtil.fetchApi("/api/v1/savings-goals", ApiUtil.RequestMethod.PUT, payload);
+            if (conn != null) {
+                int code = conn.getResponseCode();
+                if (code >= 200 && code < 300) {
+                    return true;
+                } else {
+                    System.err.println("putSavingsGoal failed with code: " + code);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (conn != null) conn.disconnect();
+        }
+        return false;
+    }
+
+    public static boolean deleteSavingsGoal(int goalId) {
+        HttpURLConnection conn = null;
+        try {
+            conn = ApiUtil.fetchApi("/api/v1/savings-goals/" + goalId, ApiUtil.RequestMethod.DELETE, null);
+            return conn != null && conn.getResponseCode() == 200;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (conn != null) conn.disconnect();
+        }
         return false;
     }
 }

@@ -1,16 +1,15 @@
-// File: expense-tracker-client/src/main/java/module-info.java
+
 module expense.tracker.client {
     requires javafx.controls;
     requires javafx.graphics;
+    requires javafx.media;
 
     requires com.google.gson;
 
-    // PDFBox 3 is modular
     requires org.apache.pdfbox;
-    requires org.apache.fontbox;   // transitive of pdfbox, safe to require
-    requires java.desktop;         // fonts/graphics helpers used by pdfbox
+    requires org.apache.fontbox;   
+    requires java.desktop;         
 
-    // Currency converter (HTTP client)
     requires java.net.http;
 
     exports org.example;

@@ -15,25 +15,20 @@ public class ApiUtil {
 
     public static HttpURLConnection fetchApi(String apiPath, RequestMethod requestMethod, JsonObject jsonData){
         try{
-            // attempt to create connection
+            
             URL url = new URL(SPRINGBOOT_URL + apiPath);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-            // set the request type
             conn.setRequestMethod(requestMethod.toString());
 
-            // to send data to the api
             if(jsonData != null && requestMethod != RequestMethod.GET){
-                // lets the api know that we will be sending in json data
+                
                 conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
-                // expects the response body to be of json type
                 conn.setRequestProperty("Accept", "application/json");
 
-                // allows us to send data to the connected api
                 conn.setDoOutput(true);
 
-                // send JSON data to the server by writing it to the output stream (closes the stream automatically)
                 try(OutputStream os = conn.getOutputStream()){
                     byte[] input = jsonData.toString().getBytes(StandardCharsets.UTF_8);
 
@@ -55,7 +50,6 @@ public class ApiUtil {
 
             Scanner scanner = new Scanner(conn.getInputStream());
 
-            // loop through each line in the response and append it to the stringbuilder
             while(scanner.hasNext()){
                 resultJson.append(scanner.nextLine());
             }
@@ -70,13 +64,3 @@ public class ApiUtil {
         return null;
     }
 }
-
-
-
-
-
-
-
-
-
-

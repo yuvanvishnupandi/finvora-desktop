@@ -1,110 +1,71 @@
-<div align="center">
-  <img src="./dashboard.png" alt="Finance Tracker" width="100%" />
+# Finvora - Finance Tracker 🚀
 
-  <p>A comprehensive, full-stack personal finance management desktop application designed to track, analyze, and grow your wealth.</p>
-</div>
+![Banner](https://img.shields.io/badge/Finance-Tracker-blue?style=for-the-badge&logo=java) ![JavaFX](https://img.shields.io/badge/JavaFX-Modern%20UI-orange?style=for-the-badge) ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-Backend-brightgreen?style=for-the-badge)
 
-## 📖 Overview
-
-**Finance Tracker** is a robust desktop application built with a modern Java tech stack to provide users with an intuitive, seamless experience in managing their personal finances. From tracking daily expenses to long-term savings goals, the application centralizes financial data into a dynamic, user-friendly interface.
+**Finvora** is an elite, robust desktop application built with a modern Java tech stack. It provides users with an intuitive, seamless experience in managing their personal finances. From tracking daily expenses and long-term savings goals to powerful AI-driven financial advice, the application centralizes financial data into a dynamic, user-friendly interface.
 
 ## ✨ Features
 
-- **Expense Tracking:** Effortlessly add, categorize, and monitor your daily spending.
-- **Analytics Dashboard:** Visualize your financial health with smart charts, income vs. expense comparisons, and spending trends.
-- **Budget Management:** Set customizable budget limits, receive spending alerts, and track category-specific goals.
-- **Transaction History:** Search and filter your transaction history with a detailed timeline view.
-- **Financial Reports:** Generate and export monthly financial reports (PDF and CSV formats).
-- **Savings Goals:** Create custom savings goals and track milestone achievements over time.
+- **Intuitive Dashboard:** A central hub displaying current balance, recent transactions, and dynamic budget charts.
+- **Transaction Management:** Easily add, edit, and delete income and expense records. Includes an advanced TimePicker for precise tracking.
+- **Budgeting System:** Set up and monitor monthly budgets across different categories, with visual progress bars.
+- **Savings Goals:** Create custom savings goals (e.g., "Manali Trip", "New Car") with dynamic, real-time progress tracking.
+- **AI Financial Assistant:** Powered by an ultra-resilient Multi-LLM Fallback Engine (Gemini, Mistral, OpenAI). Chat via voice or text, ask for financial advice, or add transactions using natural language.
+- **Proactive AI Monitoring:** Automatically scans for unused subscriptions and spending anomalies in the background.
+- **AI Receipt Scanner:** Upload JPEGs or PDFs of your receipts and let the AI extract the data automatically.
+- **Dual Themes:** Switch between modern dark mode and clean light mode seamlessly.
+- **Report Generation:** Generate and export beautiful PDF financial reports.
 
-## 🏗️ System Architecture
+## 🛠 Tech Stack
 
-The application follows a standard multi-layered Client-Server architecture to ensure high scalability and clean separation of concerns.
+### Frontend (Client)
+- **JavaFX:** UI rendering and view components.
+- **Maven:** Build automation and dependency management.
+- **Gson:** JSON parsing and serialization.
+- **Apache PDFBox:** PDF report generation.
+- **JavaFX MediaPlayer:** Audio playback for AI text-to-speech.
 
-```mermaid
-graph TD
-    subgraph Client [Frontend UI - JavaFX]
-        UI[User Interface / Views]
-        Controllers[UI Controllers]
-        UI --> Controllers
-    end
+### Backend (Server)
+- **Spring Boot (Java 17):** REST API framework.
+- **Spring Data JPA & Hibernate:** ORM and database interactions.
+- **H2 Database:** Embedded, file-based relational database for rapid, lightweight persistence.
 
-    subgraph Backend [Spring Boot API]
-        REST[REST Controllers]
-        Service[Service Layer / Business Logic]
-        Repo[Repository Layer / Spring Data JPA]
-        
-        REST --> Service
-        Service --> Repo
-    end
+## 🏗 System Architecture & Design
 
-    subgraph Database [Storage Layer]
-        DB[(MariaDB)]
-    end
+Finvora utilizes a distinct **Client-Server Architecture** separating the presentation layer from the business logic and persistence layer.
 
-    Controllers -- "HTTP/REST / JSON" --> REST
-    Repo -- "JDBC" --> DB
+### 1. Client Architecture (JavaFX)
+The frontend strictly adheres to the **MVC (Model-View-Controller)** design pattern:
+- **Models (`org.example.models`):** POJOs representing `User`, `Transaction`, `Budget`, and `SavingsGoal`.
+- **Views (`org.example.views`):** JavaFX programmatic layouts (no FXML) ensuring high performance and dynamic UI rendering.
+- **Controllers (`org.example.controllers`):** Acts as the glue between Views and Models, handling user input and triggering API calls.
+- **Services (`org.example.services`):** Advanced business logic like the `AIEngine`, `AIVoiceService`, and `AIVisionService`.
+- **Utils (`org.example.utils`):** `SqlUtil` manages all REST API HTTP calls to the Spring Boot backend using standard `HttpURLConnection`.
 
-    style Client fill:#f9f9f9,stroke:#333,stroke-width:2px
-    style Backend fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
-    style Database fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
-```
+### 2. Multi-LLM Resilient Fallback Engine
+Finvora features a state-of-the-art AI routing system. The `AIEngine` securely manages multiple API keys across different providers. If a primary provider (e.g., Gemini) hits a rate limit or fails, the engine seamlessly and instantly falls back to the next provider (Mistral, then OpenAI), guaranteeing uninterrupted AI functionality for the user.
 
-### Architecture Breakdown:
-1. **Frontend (Client):** Developed using **JavaFX**. Handles user interactions, data visualization, and PDF generation. Communicates with the backend using Google Gson for JSON parsing.
-2. **Backend (Server):** Built with **Spring Boot**. Manages business logic, request validation, and secure data processing.
-3. **Database Layer:** Uses **MariaDB** to persistently store users, transactions, budgets, and goals.
-
-## 🛠️ Tech Stack
-
-**Client-Side:**
-- Java 23
-- JavaFX 23 (Modern UI components and responsive design)
-- Apache PDFBox (PDF Generation)
-- Google Gson (JSON Parsing)
-
-**Server-Side:**
-- Java 17+
-- Spring Boot (Spring Web, Spring Data JPA)
-- Maven Build Tool
-
-**Database & Infrastructure:**
-- MariaDB
-- JDBC Driver
+### 3. Server Architecture (Spring Boot)
+The backend follows a standard **Controller-Service-Repository** pattern:
+- **Controllers:** Expose RESTful endpoints (e.g., `/api/v1/transaction`).
+- **Services:** Execute business logic and validation.
+- **Repositories:** Interface with the H2 database via Spring Data JPA.
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Java Development Kit (JDK) 23 (for Client)
-- MariaDB Server
+- JDK 17 or higher
+- Maven 3.9+
 
-### 1. Database Configuration
-Update your database credentials in the backend application properties:
-```properties
-# expense-tracker-springboot-server/src/main/resources/application.properties
-spring.datasource.url=jdbc:mariadb://localhost:3306/expense_tracker_db
-spring.datasource.username=your_db_username
-spring.datasource.password=your_db_password
-spring.datasource.driver-class-name=org.mariadb.jdbc.Driver
-spring.jpa.hibernate.ddl-auto=update
-```
-*Note: Ensure the database `expense_tracker_db` is created in your MariaDB server before running the backend.*
+### Running the Backend
+1. Navigate to `expense-tracker-springboot-server`.
+2. Run `mvn spring-boot:run`.
+3. The server will start on `http://localhost:8080`.
 
-### 2. Running the Backend (Spring Boot)
-Navigate to the backend directory and run the Spring Boot application:
-```bash
-cd expense-tracker-springboot-server
-./mvnw clean install
-./mvnw spring-boot:run
-```
+### Running the Frontend
+1. Navigate to `expense-tracker-client`.
+2. Run `mvn compile javafx:run`.
+3. The desktop client will launch. Register a new user and enjoy!
 
-### 3. Running the Frontend (JavaFX Client)
-Navigate to the client directory and start the JavaFX application:
-```bash
-cd expense-tracker-client
-mvn clean javafx:run
-```
-
-
-
-
+## 📄 License
+This project is licensed under the MIT License.

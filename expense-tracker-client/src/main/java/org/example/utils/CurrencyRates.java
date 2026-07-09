@@ -1,4 +1,4 @@
-// File: expense-tracker-client/src/main/java/org/example/utils/CurrencyRates.java
+
 package org.example.utils;
 
 import com.google.gson.JsonObject;
@@ -16,7 +16,7 @@ public final class CurrencyRates {
 
     private static final HttpClient HTTP = HttpClient.newHttpClient();
     private static final Map<String, Cache> CACHE = new HashMap<>();
-    private static final long TTL_MS = 10 * 60 * 1000; // 10 minutes
+    private static final long TTL_MS = 10 * 60 * 1000; 
 
     private static final Map<String, BigDecimal> USD_FALLBACK = Map.of(
             "INR", bd("83.0"), "EUR", bd("0.93"), "GBP", bd("0.79"), "JPY", bd("151"),
@@ -56,14 +56,14 @@ public final class CurrencyRates {
             out.put(base.toUpperCase(), BigDecimal.ONE);
             return out;
         } catch (Exception ex) {
-            // Fallback when offline:
+            
             Map<String, BigDecimal> out = new HashMap<>();
             if ("USD".equalsIgnoreCase(base)) {
                 out.putAll(USD_FALLBACK);
                 out.put("USD", BigDecimal.ONE);
                 return out;
             }
-            // base -> target ≈ (USD->target) / (USD->base)
+            
             Map<String, BigDecimal> usd = new HashMap<>(USD_FALLBACK);
             usd.put("USD", BigDecimal.ONE);
             BigDecimal usdToBase = usd.getOrDefault(base.toUpperCase(), BigDecimal.ONE);

@@ -45,10 +45,6 @@ public class ExportDataDialog extends Dialog<ExportDataDialog.ExportOptions> {
 
         getDialogPane().setContent(gp);
 
-        // 🧠 Apply theme AFTER scene is attached
-        // Platform.runLater(() -> ThemeManager.apply(getDialogPane().getScene()));
-
-        // Validations
         final Button okButton = (Button) getDialogPane().lookupButton(okBtn);
         okButton.addEventFilter(javafx.event.ActionEvent.ACTION, evt -> {
             if (!cbTransactions.isSelected() && !cbCategories.isSelected() && !cbBudgets.isSelected()) {
@@ -65,7 +61,6 @@ public class ExportDataDialog extends Dialog<ExportDataDialog.ExportOptions> {
             }
         });
 
-        // Provide result
         setResultConverter(bt -> {
             if (bt != okBtn) return null;
 
@@ -79,7 +74,6 @@ public class ExportDataDialog extends Dialog<ExportDataDialog.ExportOptions> {
         });
     }
 
-    // Inner class to return options
     public static class ExportOptions {
         public final boolean transactions;
         public final boolean categories;

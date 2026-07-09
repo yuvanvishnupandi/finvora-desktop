@@ -7,8 +7,8 @@ import org.example.models.TransactionCategory;
 import java.util.List;
 
 public class Utilitie {
-    public static final int APP_WIDTH = 1614;
-    public static final int APP_HEIGHT = 900;
+    public static final int APP_WIDTH = 1280;
+    public static final int APP_HEIGHT = 768;
 
     public static void showAlertDialog(Alert.AlertType alertType, String message){
         Alert alert = new Alert(alertType);
@@ -32,14 +32,3 @@ public class Utilitie {
         return null;
     }
 }
-
-
-
-
-
-
-
-
-
-
-

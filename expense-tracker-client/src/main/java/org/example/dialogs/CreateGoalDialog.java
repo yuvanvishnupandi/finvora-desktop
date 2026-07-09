@@ -19,11 +19,12 @@ public class CreateGoalDialog extends Dialog<SavingsGoal> {
         ButtonType createButtonType = new ButtonType("Create", ButtonBar.ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(createButtonType, ButtonType.CANCEL);
 
-        // Form
+        getDialogPane().setPrefWidth(400);
+
         GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
+        grid.setHgap(15);
+        grid.setVgap(15);
+        grid.setPadding(new Insets(20, 20, 20, 20));
 
         TextField nameField = new TextField();
         nameField.setPromptText("Goal name");
@@ -43,10 +44,6 @@ public class CreateGoalDialog extends Dialog<SavingsGoal> {
 
         getDialogPane().setContent(grid);
 
-        // ✅ Apply dark/light theme AFTER the dialog shows
-        // Platform.runLater(() -> ThemeManager.apply(getDialogPane().getScene()));
-
-        // Return result
         setResultConverter(new Callback<ButtonType, SavingsGoal>() {
             @Override
             public SavingsGoal call(ButtonType buttonType) {

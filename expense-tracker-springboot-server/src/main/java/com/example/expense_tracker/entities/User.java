@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity // marks class as JPA entity which means that it will be mapped to the user table in our db
-@Table(name = "user") // labels this entity to the proper name which is "user"
+@Table(name = "users") // labels this entity to the proper name which is "users"
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

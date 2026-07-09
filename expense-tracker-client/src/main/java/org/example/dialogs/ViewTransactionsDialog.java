@@ -24,14 +24,12 @@ public class ViewTransactionsDialog extends CustomDialog {
         this.monthName = monthName;
 
         setTitle("View Transactions");
-        setWidth(815);
-        setHeight(500);
+        setWidth(1000);
+        setHeight(700);
 
         ScrollPane transactionScrollPane = createTransactionScrollPane();
         getDialogPane().setContent(transactionScrollPane);
 
-        // ✅ Theme adjust after scene loads
-        // Platform.runLater(() -> ThemeManager.apply(getDialogPane().getScene()));
     }
 
     private ScrollPane createTransactionScrollPane() {
@@ -50,7 +48,7 @@ public class ViewTransactionsDialog extends CustomDialog {
         if (transactions != null) {
             for (Transaction t : transactions) {
                 TransactionComponent comp = new TransactionComponent(dashboardController, t);
-                comp.getStyleClass().add("border-light-gray"); // 🟦 Your design
+                comp.getStyleClass().add("border-light-gray"); 
                 vBox.getChildren().add(comp);
             }
         }

@@ -37,6 +37,8 @@ public class TransactionComponent extends HBox {
 
         transactionAmountLabel = new Label("₹" + transaction.getTransactionAmount());
         transactionAmountLabel.getStyleClass().add("text-size-md");
+        transactionAmountLabel.setMinWidth(Region.USE_PREF_SIZE);
+        
         if(transaction.getTransactionType().equalsIgnoreCase("expense")){
             transactionAmountLabel.getStyleClass().add("text-light-red");
         }else{
@@ -44,6 +46,10 @@ public class TransactionComponent extends HBox {
         }
 
         HBox actionButtonSection = createActionButtons();
+        actionButtonSection.setMinWidth(Region.USE_PREF_SIZE);
+
+        HBox.setHgrow(categoryNameDateSection, Priority.ALWAYS);
+        categoryNameDateSection.setMinWidth(0);
 
         getChildren().addAll(categoryNameDateSection, region, transactionAmountLabel, actionButtonSection);
     }
@@ -53,17 +59,24 @@ public class TransactionComponent extends HBox {
 
         if(transaction.getTransactionCategory() == null){
             transactionCategoryLabel = new Label("Undefined");
-            transactionCategoryLabel.getStyleClass().addAll("text-light-gray");
         }else{
             transactionCategoryLabel = new Label(transaction.getTransactionCategory().getCategoryName());
-            transactionCategoryLabel.setTextFill(Paint.valueOf("#" + transaction.getTransactionCategory().getCategoryColor()));
+            String catColor = transaction.getTransactionCategory().getCategoryColor();
+            if (catColor != null && !catColor.startsWith("#")) {
+                catColor = "#" + catColor;
+            }
+            transactionCategoryLabel.setTextFill(Paint.valueOf(catColor));
         }
 
         transactionNameLabel = new Label(transaction.getTransactionName());
-        transactionNameLabel.getStyleClass().addAll("text-light-gray", "text-size-md");
+        transactionNameLabel.getStyleClass().add("text-size-md");
+        transactionNameLabel.setMinWidth(0);
 
-        transactionDateLabel = new Label(transaction.getTransactionDate().toString());
-        transactionDateLabel.getStyleClass().addAll("text-light-gray");
+        String dateStr = transaction.getTransactionDate().toString();
+        if (transaction.getTransactionTime() != null && !transaction.getTransactionTime().isEmpty()) {
+            dateStr += " at " + transaction.getTransactionTime();
+        }
+        transactionDateLabel = new Label(dateStr);
 
         categoryNameDateSection.getChildren().addAll(transactionCategoryLabel, transactionNameLabel, transactionDateLabel);
         return categoryNameDateSection;
@@ -92,14 +105,12 @@ public class TransactionComponent extends HBox {
                     return;
                 }
 
-                // remove the component from the dashboard
                 setVisible(false);
                 setManaged(false);
                 if(getParent() instanceof VBox){
                     ((VBox) getParent()).getChildren().remove(TransactionComponent.this);
                 }
 
-                // refresh the dashboard
                 dashboardController.fetchUserData();
             }
         });
@@ -126,13 +137,3 @@ public class TransactionComponent extends HBox {
         return transactionAmountLabel;
     }
 }
-
-
-
-
-
-
-
-
-
-

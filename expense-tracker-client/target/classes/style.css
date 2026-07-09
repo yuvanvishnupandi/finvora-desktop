@@ -1,525 +1,436 @@
-/* style.css (Universal Style File - Implements Local Dark/Light Toggle) */
+/* style.css (Aurora Light Theme & Split-Screen Login) */
 
-/* --- CORE UI ELEMENTS (Dark Mode Defaults) --- */
-Button{
+* {
+    -fx-font-family: "Segoe UI", "Inter", "Helvetica Neue", sans-serif;
+}
+
+Button {
     -fx-cursor: hand;
+    -fx-transition: all 0.2s ease;
 }
 
-.combo-box .list-cell:hover,
-Button:hover{
-    -fx-opacity: 0.5;
-}
-
-ScrollPane,
-ScrollPane > .viewport {
+ScrollPane, ScrollPane > .viewport {
    -fx-background-color: transparent;
 }
 
-.table-view .column-header{
-    -fx-background-color: #515050;
+/* ==========================================================
+   1. SPLIT-SCREEN LOGIN / REGISTER (Dark & Purple)
+   ========================================================== */
+.split-root {
+    -fx-background-color: #121212; /* Fallback */
 }
 
-.table-view .column-header .label{
-    -fx-text-fill: #fff;
+.split-left {
+    -fx-background-color: #1A1A1A; /* Dark minimalist left side */
+    -fx-padding: 50px;
 }
 
-.table-view .scroll-bar:horizontal,
-.table-view .scroll-bar:vertical{
+.split-right {
+    -fx-background-color: linear-gradient(to bottom right, #8B5CF6, #6D28D9); /* Vibrant purple gradient */
+}
+
+.split-header {
+    -fx-font-size: 32px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #FFFFFF;
+}
+
+.split-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #A3A3A3;
+}
+
+.split-input {
+    -fx-background-color: #262626;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #404040;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 14px;
+    -fx-font-size: 14px;
+}
+.split-input:focused {
+    -fx-border-color: #8B5CF6;
+}
+
+.split-button {
+    -fx-background-color: #8B5CF6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+    -fx-padding: 14px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+}
+.split-button:hover {
+    -fx-background-color: #7C3AED;
+}
+
+.split-link {
+    -fx-text-fill: #A3A3A3;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-padding: 10px 0 0 0;
+}
+.split-link:hover {
+    -fx-text-fill: #8B5CF6;
+    -fx-underline: true;
+}
+
+.split-quote {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FFFFFF;
+}
+
+.split-quote-sub {
+    -fx-font-size: 14px;
+    -fx-text-fill: rgba(255,255,255,0.8);
+    -fx-line-spacing: 5px;
+}
+
+/* ==========================================================
+   2. AURORA DASHBOARD (Light, Clean, White)
+   ========================================================== */
+.main-background-light, .main-background { 
+    -fx-background-color: #F8FAFC; 
+}
+.main-background-dark {
+    -fx-background-color: #0B0F19; /* Deep dark blue/purple */
+}
+
+/* --- STATS CARDS & SQUIRCLES --- */
+.stat-card, .ui-card, .ui-card-squircle {
+    -fx-background-color: #FFFFFF; 
+    -fx-padding: 25px 30px; 
+    -fx-background-radius: 24px;
+    -fx-border-radius: 24px;
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 15, 0, 4, 4); 
+    -fx-spacing: 8px;
+    -fx-alignment: center;
+}
+.stat-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 20, 0, 6, 6); 
+    -fx-scale-x: 1.01;
+    -fx-scale-y: 1.01;
+}
+
+.stat-label {
+    -fx-text-fill: #64748B;
+    -fx-font-size: 13px; 
+    -fx-font-weight: 600;
+}
+
+.stat-amount {
+    -fx-text-fill: #0F172A;
+    -fx-font-size: 28px; 
+    -fx-font-weight: 800;
+}
+
+/* --- SIDEBAR MENU --- */
+.sidebar {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent #E2E8F0 transparent transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 20px 15px;
+}
+.sidebar-header {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8B5CF6;
+    -fx-padding: 0 0 10px 10px;
+}
+.sidebar-menu-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-alignment: center-left;
+    -fx-padding: 12px 15px;
+    -fx-background-radius: 8px;
+}
+.sidebar-menu-btn:hover {
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: #0F172A;
+}
+.sidebar-menu-btn .label {
+    -fx-text-fill: inherit;
+}
+
+/* --- AI VOICE PLANNER (Clean White Style) --- */
+.input-field {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #0F172A; 
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 10px 14px;
+    -fx-font-size: 14px;
+}
+.input-field:focused {
+    -fx-border-color: #8B5CF6;
+}
+
+.primary-button {
+    -fx-background-color: #8B5CF6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-padding: 10px 20px;
+}
+.primary-button:hover {
+    -fx-background-color: #7C3AED;
+}
+
+.toggle-button {
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 10px 20px;
+    -fx-cursor: hand;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 8px;
+}
+.toggle-button:selected {
+    -fx-background-color: #EF4444; /* Red when listening */
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+}
+
+/* --- RECENT TRANSACTIONS --- */
+.recent-transactions-box {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-border-color: #E2E8F0;
+    -fx-padding: 25px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 10, 0, 2, 2); 
+}
+
+.recent-transactions-box VBox {
+    -fx-background-color: #F8FAFC; 
+    -fx-background-radius: 8px;
+    -fx-padding: 15px;
+    -fx-border-color: #F1F5F9;
+    -fx-border-radius: 8px;
+}
+.recent-transactions-box VBox:hover {
+    -fx-background-color: #F1F5F9;
+}
+
+.text-size-lg { -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0F172A; }
+.text-size-md { -fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1E293B; }
+.text-size-sm { -fx-font-size: 13px; }
+.text-white { -fx-text-fill: #0F172A; } /* Overridden for light mode */
+.text-light-gray { -fx-text-fill: #64748B; }
+.text-light-green { -fx-text-fill: #10B981; -fx-font-weight: bold; }
+.text-light-red { -fx-text-fill: #EF4444; -fx-font-weight: bold; }
+.recent-transactions-box .vbox .label { -fx-text-fill: #0F172A; }
+
+/* --- TABLE VIEW --- */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 8px;
+}
+.table-view .column-header-background,
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: #F1F5F9;
+}
+.table-view .column-header .label {
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-padding: 8px;
+}
+.table-row-cell:even { -fx-background-color: #FFFFFF; }
+.table-row-cell:odd { -fx-background-color: #F8FAFC; }
+.table-row-cell:hover { -fx-background-color: #F1F5F9; }
+.table-view .table-cell {
+    -fx-text-fill: #0F172A;
+    -fx-font-size: 14px;
+    -fx-border-color: transparent;
+}
+.table-view .scroll-bar:horizontal, .table-view .scroll-bar:vertical {
     -fx-opacity: 0;
     -fx-pref-width: 0;
     -fx-pref-height: 0;
 }
 
-.chart-title {
-    -fx-text-fill: #BEB9B9;
-}
-
-.axis-label {
-    -fx-text-fill: #BEB9B9;
-}
-
-.chart-legend {
-    -fx-text-fill: #BEB9B9;
-}
-
-/* We rely on Java code for chart-pie-label color now */
-
-.pie-chart .chart-pie-label {
-    -fx-text-fill: #FFFFFF; 
-}
-
-.chart-pie-label-line {
-    -fx-stroke: #BEB9B9;
-    -fx-stroke-width: 1px;
-}
-
-.default-color0.chart-legend-item-symbol{
-    -fx-background-color: #33ba2f;
-}
-
-.default-color1.chart-legend-item-symbol{
-    -fx-background-color: #ba2f2f;
-}
-
-.text-size-lg{
-    -fx-font-size: 36px;
-}
-
-.text-size-md{
-    -fx-font-size: 24px;
-}
-
-.text-size-sm{
-    -fx-font-size: 12px;
-}
-
-.text-white{
-    -fx-text-fill: #fff;
-}
-
-.text-light-red{
-    -fx-text-fill: #ba2f2f;
-}
-
-.text-light-green{
-    -fx-text-fill: #33ba2f;
-}
-
-.text-light-gray{
-    -fx-text-fill: #BEB9B9;
-}
-
-.text-weight-700{
-    -fx-font-weight: 700;
-}
-
-.bg-light-blue{
-    -fx-background-color: #377BE1;
-}
-
-.bg-light-red{
-    -fx-background-color: #e13742;
-}
-
-.text-underline{
-    -fx-underline: true;
-}
-
-.padding-10px{
-    -fx-padding: 10px;
-}
-
-.rounded-border{
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
-}
-
-.border-light-gray{
-    -fx-border-width: 5px;
-    -fx-border-color: #515050;
-}
-
-/* --- THEME SPECIFIC BACKGROUND CLASSES --- */
-.main-background-dark { 
-    -fx-background-color: #383838; /* Default Dark Background */
-}
-.main-background-light { 
-    -fx-background-color: #f7f7f7; /* New Light Mode Background (White) */
-}
-
-.main-background{
-    -fx-background-color: #383838;
-}
-
-.header{
-    -fx-font-size: 96px;
-    -fx-font-weight: 300;
-}
-
-.field-background{
-    -fx-background-color: #515050;
-}
-
-.link-text{
-    -fx-cursor: hand;
-}
-
-.link-text:hover{
-    -fx-text-fill: #4265c7;
-}
-
-.dashboard-padding{
-    -fx-padding: 33px 43px;
-}
-
-.combo-box .list-cell,
-.date-picker .text-field {
-    -fx-background-color: #515050;
-    -fx-text-fill: #BEB9B9;
-}
-
-.ui-card {
-    -fx-background-color: #2c2c2c;
-    -fx-background-radius: 15px;
-    -fx-border-radius: 15px;
-    -fx-padding: 40px;
-    -fx-effect: gaussian(rgba(0, 0, 0, 0.3), 20, 0, 0, 4);
-    -fx-spacing: 20px;
-    -fx-alignment: center;
-}
-
-.ui-card:hover {
-    -fx-scale-x: 1.01;
-    -fx-scale-y: 1.01;
-    -fx-cursor: default;
-}
-
-.ui-panel {
-    -fx-background-color: #2c2c2c;
-    -fx-background-radius: 15px;
-    -fx-padding: 30px;
-}
-
-.center-box {
-    -fx-alignment: center;
-    -fx-spacing: 25px;
-    -fx-padding: 50px 0;
-}
-
-.input-field {
-    -fx-background-color: #414141;
-    -fx-text-fill: #ffffff;
-    -fx-border-color: #666666;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
-    -fx-padding: 12px 14px;
-    -fx-font-size: 14px;
-}
-
-.input-field:focused {
-    -fx-border-color: #377BE1;
-    -fx-effect: gaussian(#377BE1, 5, 0.5, 0, 0);
-}
-
-.primary-button {
-    -fx-background-color: linear-gradient(to right, #377BE1, #335de1);
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-background-radius: 8px;
-    -fx-border-radius: 8px;
-    -fx-cursor: hand;
-    -fx-padding: 12px;
-    -fx-pref-width: 200px;
-    -fx-alignment: center;
-}
-
-.primary-button:hover {
-    -fx-background-color: linear-gradient(to right, #335de1, #2a4bdc);
-}
-
-.link-label {
-    -fx-text-fill: #BEB9B9;
-    -fx-font-size: 13px;
-    -fx-underline: true;
-    -fx-cursor: hand;
-}
-
-.link-label:hover {
-    -fx-text-fill: #5499ff;
-}
-
-/* --- UPDATED STATS CARD STYLES (DARK MODE) --- */
-.stat-card {
-    -fx-background-color: #2f3136;
-    -fx-padding: 25px 30px; 
-    -fx-background-radius: 12;
-    -fx-border-radius: 12;
-    -fx-effect: gaussian(rgba(0, 0, 0, 0.35), 8, 0, 0, 4); 
-    -fx-spacing: 6px;
-    -fx-alignment: center;
-}
-
-.stat-card:hover {
-    -fx-scale-x: 1.03;
-    -fx-scale-y: 1.03;
-    -fx-background-color: #383a40; 
-    -fx-effect: gaussian(rgba(0, 0, 0, 0.5), 15, 0, 0, 6); 
-}
-
-.stat-label {
-    -fx-text-fill: #c0c0c0;
-    -fx-font-size: 14px; 
-    -fx-font-weight: 500;
-}
-
-.stat-amount {
-    -fx-text-fill: white;
-    -fx-font-size: 28px; 
-    -fx-font-weight: bold;
-}
-/* --- END UPDATED STATS CARD STYLES --- */
-
-
-.year-combo {
-    -fx-background-color: #333;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
-    -fx-padding: 6px;
-    -fx-text-fill: white;
-}
-
-.chart-button {
-    -fx-background-color: #446df2;
-    -fx-text-fill: white;
-    -fx-padding: 10px 20px;
-    -fx-background-radius: 8px;
-    -fx-font-weight: bold;
-    -fx-cursor: hand;
-}
-
-.table-view {
-    -fx-background-color: #2e2e2e;
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
-    -fx-padding: 10px;
-}
-
-.table-row-cell:even {
-    -fx-background-color: #393939;
-}
-
-.table-row-cell:odd {
-    -fx-background-color: #2e2e2e;
-}
-
-.table-view .column-header,
-.table-view .filler {
-    -fx-background-color: #444;
-}
-
-.table-view .column-header .label {
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-font-size: 14px;
-}
-
-.recent-transactions-box {
-    -fx-background-color: #2c2c2c;
-    -fx-background-radius: 12px;
-    -fx-effect: gaussian(rgba(0, 0, 0, 0.3), 10, 0, 0, 4);
-    -fx-padding: 20px;
-}
-
-/* --- NAVBAR & USER INFO STYLES (DARK MODE) --- */
+/* --- NAVBAR --- */
 .top-bar-background {
-    -fx-background-color: #2c2c2c; 
-    -fx-min-height: 40px; 
-}
-
-.user-name-label {
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-text-fill: white; 
-}
-
-.user-email-label {
-    -fx-font-size: 10px;
-    -fx-text-fill: #cccccc; 
-}
-
-.menu-bar {
-    -fx-background-color: transparent; 
-    -fx-border-width: 0;
-    -fx-padding: 0;
-}
-
-.menu {
-    -fx-text-fill: white;
-}
-
-.menu-item {
-    -fx-background-color: #2c2c2c;
-    -fx-text-fill: white;
-}
-
-.menu-item:hover {
-    -fx-background-color: #3a3a3a;
-}
-
-.menu-bar > .container > .menu-button > .label {
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 16px;
-    -fx-font-weight: 600;
-}
-
-.menu-bar > .container > .menu-button:hover,
-.menu-bar > .container > .menu-button:focused,
-.menu-bar > .container > .menu-button:showing {
-    -fx-background-color: rgba(255,255,255,0.12);
-}
-/* --- END NAVBAR & USER INFO STYLES --- */
-
-/* --- ADDED THEME TOGGLE STYLE --- */
-.theme-toggle {
-    -fx-background-color: #2c2c2c;
-    -fx-text-fill: #BEB9B9;
-    -fx-border-color: #515050;
-    -fx-border-radius: 4px;
-    -fx-background-radius: 4px;
-    -fx-padding: 4px 8px;
-    -fx-font-weight: 700;
-}
-.theme-toggle:selected {
-    -fx-background-color: #377BE1;
-    -fx-text-fill: white;
-    -fx-border-color: #377BE1;
-}
-
-/* --- DIALOGS & MENUS (UNIVERSAL LIGHT THEME) --- */
-
-/* 1. Context Menu (The dropdown menu when clicking Category/Savings, etc.) */
-.context-menu {
-    -fx-background-color: #ffffff; /* White background */
-    -fx-background-radius: 8px;
-    -fx-padding: 6 0;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 4);
-}
-.menu-item {
-    -fx-background-color: transparent;
-    -fx-text-fill: #111; /* Dark text */
-}
-.menu-item:hover {
-    -fx-background-color: #e5e5e5;
-}
-.menu-item > .label {
-    -fx-text-fill: #111;
-    -fx-font-size: 14px;
-}
-.menu-item:focused {
-    -fx-background-color: #f0f0f0;
-}
-.menu-item:focused > .label {
-    -fx-text-fill: #111;
-}
-
-
-/* 2. Dialog Pane (Alerts, Goals, Category Windows) */
-.dialog-pane {
-    -fx-background-color: #ffffff; /* White background */
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
-    -fx-font-family: 'Segoe UI', sans-serif;
-}
-.dialog-pane .label, .dialog-pane .header-panel .label {
-    -fx-text-fill: #111; /* Dark text */
-}
-.dialog-pane .header-panel {
-    -fx-background-color: #f0f0f0;
-}
-.dialog-pane .content {
-    -fx-background-color: #ffffff; 
-}
-
-
-/* Input fields inside universal light dialogs */
-.dialog-pane .text-field,
-.dialog-pane .combo-box .list-cell,
-.dialog-pane .date-picker .text-field {
-    -fx-background-color: #ffffff; /* White background for input boxes */
-    -fx-text-fill: #111; /* Black input text */
-    -fx-border-color: #cccccc;
+    -fx-background-color: #FFFFFF; 
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
     -fx-border-width: 1px;
 }
-.dialog-pane .date-picker-popup .calendar-day-cell .label {
-    -fx-text-fill: black;
+.user-name-label { -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #0F172A; }
+.user-email-label { -fx-font-size: 11px; -fx-text-fill: #64748B; }
+
+.menu-bar { -fx-background-color: transparent; }
+.menu-bar > .container > .menu-button > .label {
+    -fx-text-fill: #475569;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
 }
-.dialog-pane .date-picker-popup .calendar-day-cell:selected .label {
-    -fx-text-fill: white;
+.menu-bar > .container > .menu-button:hover {
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 6px;
 }
+.menu-item { -fx-background-color: #FFFFFF; }
+.menu-item:hover { -fx-background-color: #F1F5F9; }
+.menu-item > .label { -fx-text-fill: #0F172A; }
 
-
-/* --- LIGHT MODE OVERRIDES (Applied when main-background-light is active) --- */
-
-/* 1. Main Background */
-.main-background-light { 
-    -fx-background-color: #f7f7f7; /* White Background for main page */
-}
-
-/* 2. Overriding ALL components to light colors and dark text */
-
-/* --- STAT CARDS --- */
-.main-background-light .stat-card {
+/* --- DIALOGS --- */
+.dialog-pane {
     -fx-background-color: #ffffff;
-    -fx-border-color: #e5e5e5;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
 }
-.main-background-light .stat-card:hover {
-    -fx-background-color: #e5e5e5;
+.dialog-pane .label, .dialog-pane .header-panel .label {
+    -fx-text-fill: #0F172A; 
+    -fx-font-weight: bold;
+}
+.dialog-pane .header-panel {
+    -fx-background-color: #F8FAFC;
+    -fx-border-radius: 12px 12px 0 0;
+    -fx-background-radius: 12px 12px 0 0;
+}
+.dialog-pane .content { -fx-background-color: #ffffff; }
+
+.dialog-pane .text-field, .dialog-pane .date-picker .text-field {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #0F172A;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px 12px;
+}
+.dialog-pane .text-field:focused {
+    -fx-border-color: #8B5CF6;
+}/* --- DARK MODE OVERRIDES --- */
+.main-background-dark .sidebar,
+.main-background-dark .stat-card,
+.main-background-dark .ui-card,
+.main-background-dark .ui-card-squircle,
+.main-background-dark .input-field,
+.main-background-dark .recent-transactions-box {
+    -fx-background-color: #151B2B;
+    -fx-border-color: #1E293B;
+}
+.main-background-dark .recent-transactions-box VBox {
+    -fx-background-color: #1E293B;
+    -fx-border-color: #334155;
+}
+.main-background-dark .recent-transactions-box VBox:hover {
+    -fx-background-color: #334155;
+}
+.main-background-dark .sidebar-header {
+    -fx-text-fill: #A78BFA;
+}
+.main-background-dark .sidebar-menu-btn {
+    -fx-text-fill: #D4D4D4;
+}
+.main-background-dark .sidebar-menu-btn:hover {
+    -fx-background-color: #1E293B;
+    -fx-text-fill: #FFFFFF;
+}
+.main-background-dark .stat-label {
+    -fx-text-fill: #94A3B8;
+}
+.main-background-dark .stat-amount,
+.main-background-dark Label,
+.main-background-dark .table-view .column-header .label,
+.main-background-dark .recent-transactions-box .vbox .label {
+    -fx-text-fill: #FFFFFF;
+}
+.main-background-dark .table-view,
+.main-background-dark .table-view .column-header-background,
+.main-background-dark .table-view .column-header,
+.main-background-dark .table-row-cell {
+    -fx-background-color: transparent;
+}
+.main-background-dark .table-row-cell {
+    -fx-border-color: transparent transparent #1E293B transparent;
+    -fx-text-fill: #FFFFFF;
+}
+.main-background-dark .table-row-cell:hover {
+    -fx-background-color: #1E293B;
 }
 
-/* --- TEXT VISIBILITY FIXES (Dashboard Labels) --- */
-.main-background-light .text-light-gray, 
-.main-background-light .user-email-label,
-.main-background-light .stat-label {
-    -fx-text-fill: #383838; 
+/* ==========================================================
+   3. MODERN GRADIENT CARDS & PROGRESS BAR
+   ========================================================== */
+.card-balance {
+    -fx-background-color: linear-gradient(to bottom right, #3B82F6, #1D4ED8);
+    -fx-border-color: transparent;
 }
-.main-background-light .text-white,
-.main-background-light .user-name-label,
-.main-background-light .stat-amount {
-    -fx-text-fill: #111; 
+.card-balance .stat-label {
+    -fx-text-fill: #E0F2FE;
 }
-
-/* --- NAVBAR/TOP BAR --- */
-.main-background-light .top-bar-background {
-    -fx-background-color: #ffffff; 
-}
-.main-background-light .menu-bar > .container > .menu-button > .label {
-    -fx-text-fill: #111;
+.card-balance .stat-amount {
+    -fx-text-fill: #FFFFFF;
 }
 
-/* --- TABLE OVERRIDES --- */
-.main-background-light .table-view {
-    -fx-background-color: #ffffff;
+.card-income {
+    -fx-background-color: linear-gradient(to bottom right, #10B981, #047857);
+    -fx-border-color: transparent;
 }
-.main-background-light .table-view .column-header,
-.main-background-light .table-view .filler,
-.main-background-light .table-view .column-header-background {
-    -fx-background-color: #e5e5e5;
+.card-income .stat-label {
+    -fx-text-fill: #D1FAE5;
 }
-.main-background-light .table-view .column-header .label {
-    -fx-text-fill: #383838;
+.card-income .stat-amount {
+    -fx-text-fill: #FFFFFF;
 }
 
-/* Table Data (Month, Income, Expense numbers) - VISIBILITY FIX */
-.main-background-light .table-view .table-cell {
-    -fx-text-fill: #FFFFFF; 
+.card-expense {
+    -fx-background-color: linear-gradient(to bottom right, #EF4444, #B91C1C);
+    -fx-border-color: transparent;
 }
-.main-background-light .table-row-cell:even {
-    -fx-background-color: #393939; 
+.card-expense .stat-label {
+    -fx-text-fill: #FEE2E2;
 }
-.main-background-light .table-row-cell:odd {
-    -fx-background-color: #2e2e2e; 
-}
-
-/* --- FIELD CONTAINERS (Recent Transactions Box) --- */
-.main-background-light .field-background,
-.main-background-light .recent-transactions-box {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #e0e0e0;
-}
-.main-background-light .recent-transactions-box .text-size-lg {
-    -fx-text-fill: #111;
+.card-expense .stat-amount {
+    -fx-text-fill: #FFFFFF;
 }
 
-/* Transaction Rows (Maintaining Dark Look inside the Light container) */
-.main-background-light .recent-transactions-box VBox {
-    -fx-background-color: #2c2c2c; 
+.card-budget {
+    -fx-background-color: linear-gradient(to bottom right, #F59E0B, #D97706);
+    -fx-border-color: transparent;
 }
-.main-background-light .recent-transactions-box .vbox .label {
-    -fx-text-fill: #E5E5E5; 
+.card-budget .stat-label {
+    -fx-text-fill: #FEF3C7;
 }
-.main-background-light .recent-transactions-box .text-light-green {
-    -fx-text-fill: #33ba2f; 
+.card-budget .stat-amount {
+    -fx-text-fill: #FFFFFF;
 }
-.main-background-light .recent-transactions-box .text-light-red {
-    -fx-text-fill: #ba2f2f; 
+
+.card-savings {
+    -fx-background-color: linear-gradient(to bottom right, #8B5CF6, #6D28D9);
+    -fx-border-color: transparent;
 }
+.card-savings .stat-label {
+    -fx-text-fill: #F5F3FF;
+}
+.card-savings .stat-amount {
+    -fx-text-fill: #FFFFFF;
+}
+
+/* Premium styled load/progress bar */
+.progress-bar {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-padding: 1px;
+}
+.progress-bar > .track {
+    -fx-background-color: transparent;
+}
+.progress-bar > .bar {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 8px;
+}
+

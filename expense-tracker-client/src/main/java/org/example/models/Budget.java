@@ -14,8 +14,8 @@ public class Budget {
     private BigDecimal spentAmount = BigDecimal.ZERO;
     private int year;
     private PeriodType periodType;
-    private Integer month;   // 1..12 if MONTHLY; null otherwise
-    private Integer quarter; // 1..4  if QUARTERLY; null otherwise
+    private Integer month;   
+    private Integer quarter; 
 
     public Budget() {}
 
@@ -64,7 +64,6 @@ public class Budget {
         }
     }
 
-    // equals/hashCode by userEmail, category, year, periodType, month, quarter
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -83,7 +82,6 @@ public class Budget {
         return Objects.hash(userEmail, category, year, periodType, month, quarter);
     }
 
-    // Getters/Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

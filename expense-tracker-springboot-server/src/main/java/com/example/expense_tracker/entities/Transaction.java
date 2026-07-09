@@ -28,6 +28,9 @@ public class Transaction {
     @Column(name = "transaction_date")
     private LocalDate transactionDate;
 
+    @Column(name = "transaction_time")
+    private String transactionTime;
+
     @Column(name = "transaction_type")
     private String transactionType;
 
@@ -73,6 +76,14 @@ public class Transaction {
 
     public void setTransactionDate(LocalDate transactionDate) {
         this.transactionDate = transactionDate;
+    }
+
+    public String getTransactionTime() {
+        return transactionTime;
+    }
+
+    public void setTransactionTime(String transactionTime) {
+        this.transactionTime = transactionTime;
     }
 
     public String getTransactionType() {

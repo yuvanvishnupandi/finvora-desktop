@@ -77,8 +77,6 @@ public class CurrencyConverterDialog extends Dialog<Void> {
 
         getDialogPane().setContent(gp);
 
-        // ✅ Automatically apply the dark OR light theme to the dialog when it appears
-        // Platform.runLater(() -> ThemeManager.apply(getDialogPane().getScene()));
     }
 
     private void doConvert() {

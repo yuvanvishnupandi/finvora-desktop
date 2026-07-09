@@ -11,12 +11,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        stage.setTitle("Finance Tracker");
+        stage.setTitle("Finvora");
         ViewNavigator.setMainStage(stage);
         new LoginView().show();
     }
 
-    // THIS IS THE CRITICAL MISSING ENTRY POINT
     public static void main(String[] args) {
         launch(args);
     }

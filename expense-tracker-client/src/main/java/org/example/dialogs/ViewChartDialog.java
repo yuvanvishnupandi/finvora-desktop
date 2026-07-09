@@ -32,10 +32,9 @@ public class ViewChartDialog extends CustomDialog {
         this.year = year;
 
         setTitle("View Chart");
-        setWidth(950);
-        setHeight(600);
+        setWidth(1100);
+        setHeight(750);
 
-        // LEFT: VBox for BarChart (Income vs Expense)
         VBox leftBox = new VBox(8);
         leftBox.setPadding(new Insets(10));
 
@@ -64,7 +63,6 @@ public class ViewChartDialog extends CustomDialog {
         barChart.getData().addAll(incomeSeries, expenseSeries);
         leftBox.getChildren().add(barChart);
 
-        // RIGHT: VBox for PieChart (Expenses by Category)
         VBox rightBox = new VBox(8);
         rightBox.setPadding(new Insets(10));
 
@@ -78,31 +76,26 @@ public class ViewChartDialog extends CustomDialog {
             pie.setLabelsVisible(true);
             rightBox.getChildren().add(pie);
 
-            // Update styling after pie chart renders
             Platform.runLater(() -> {
-                // Force chart title & legend text color
+                
                 pie.lookupAll(".chart-title").forEach(title -> title.setStyle("-fx-text-fill: #BEB9B9;"));
                 pie.lookupAll(".chart-legend").forEach(legend -> legend.setStyle("-fx-text-fill: #BEB9B9;"));
 
-                // Set ID to each slice (used in style.css for color)
                 for (PieChart.Data d : pie.getData()) {
                     if (d.getNode() != null) {
                         String cleanId = "#" + d.getName().toLowerCase().replaceAll("[^a-z0-9]", "-") + "-slice";
-                        d.getNode().setId(cleanId.substring(1)); // remove '#' for setId(...)
+                        d.getNode().setId(cleanId.substring(1)); 
 
-                        // Optional: Labels inside slices
                         d.getNode().lookupAll("Label").forEach(label ->
                                 label.setStyle("-fx-text-fill: white; -fx-font-weight: bold;"));
                     }
                 }
 
-                // Label force fallback
                 pie.lookupAll(".chart-pie-label").forEach(label ->
                         label.setStyle("-fx-text-fill: white; -fx-font-weight: bold;"));
             });
         }
 
-        // Root layout
         HBox root = new HBox(16, leftBox, rightBox);
         root.setPadding(new Insets(10));
         HBox.setHgrow(leftBox, Priority.ALWAYS);
@@ -114,11 +107,8 @@ public class ViewChartDialog extends CustomDialog {
 
         getDialogPane().setContent(root);
 
-        // ✅ Apply theme dynamically to match current mode
-        // Platform.runLater(() -> ThemeManager.apply(getDialogPane().getScene()));
     }
 
-    // Build pie slices for category-wise expenses
     private List<PieChart.Data> buildExpenseByCategorySlices(int userId, int year) {
         List<Transaction> txList = SqlUtil.getAllTransactionsByUserId(userId, year, null);
         if (txList == null || txList.isEmpty()) return List.of();
@@ -143,7 +133,7 @@ public class ViewChartDialog extends CustomDialog {
         List<PieChart.Data> result = new ArrayList<>();
         BigDecimal others = BigDecimal.ZERO;
 
-        final int TOP = 6; // Show up to 6 categories
+        final int TOP = 6; 
         for (int i = 0; i < sorted.size(); i++) {
             Map.Entry<String, BigDecimal> entry = sorted.get(i);
             if (i < TOP) {

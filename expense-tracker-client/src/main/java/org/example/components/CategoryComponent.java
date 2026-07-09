@@ -65,14 +65,11 @@ public class CategoryComponent extends HBox {
             public void handle(MouseEvent mouseEvent) {
                 handleToggle();
 
-                // extract data
                 String newCatgoryName = categoryTextField.getText();
                 String newCategoryColor = Utilitie.getHexColorValue(colorPicker);
 
-                // update database
                 SqlUtil.putTransactionCategory(transactionCategory.getId(), newCatgoryName, newCategoryColor);
 
-                // refreshes the dashboard
                 dashboardController.fetchUserData();
             }
         });
@@ -87,7 +84,6 @@ public class CategoryComponent extends HBox {
                     return;
                 }
 
-                // remove this component from the dialog
                 setVisible(false);
                 setManaged(false);
 
@@ -97,7 +93,6 @@ public class CategoryComponent extends HBox {
             }
         });
 
-
         getChildren().addAll(categoryTextField, colorPicker, editButton, saveButton, deleteButton);
     }
 
@@ -105,50 +100,29 @@ public class CategoryComponent extends HBox {
         if(!isEditing){
             isEditing = true;
 
-            // enable the category text field
             categoryTextField.setEditable(true);
             categoryTextField.setStyle("-fx-background-color: #fff; -fx-text-fill: #000");
 
-            // enable the color picker
             colorPicker.setDisable(false);
 
-            // hide the edit button
             editButton.setVisible(false);
             editButton.setManaged(false);
 
-            // display the save button
             saveButton.setVisible(true);
             saveButton.setManaged(true);
         }else{
             isEditing = false;
 
-            // disable the category text field
             categoryTextField.setEditable(false);
             categoryTextField.setStyle("-fx-background-color: #515050; -fx-text-fill: #BEB9B9");
 
-            // disable the color picker
             colorPicker.setDisable(true);
 
-            // display the edit button
             editButton.setVisible(true);
             editButton.setManaged(true);
 
-            // hide the save button
             saveButton.setVisible(false);
             saveButton.setManaged(false);
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -31,6 +31,9 @@ public class CreateOrEditTransactionDialog extends CustomDialog {
     private TextField transactionNameField;
     private TextField transactionAmountField;
     private DatePicker transactionDatePicker;
+    private ComboBox<String> hourBox;
+    private ComboBox<String> minuteBox;
+    private ComboBox<String> amPmBox;
     private ComboBox<String> transactionCategoryBox;
     private ToggleGroup transactionTypeToggleGroup;
 
@@ -48,16 +51,14 @@ public class CreateOrEditTransactionDialog extends CustomDialog {
         this.isEditing = isEditing;
 
         setTitle(isEditing ? "Edit Transaction" : "Create New Transaction");
-        setWidth(700);
-        setHeight(595);
+        setWidth(950);
+        setHeight(700);
 
         transactionCategories = SqlUtil.getAllTransactionCategoriesByUser(user);
 
         VBox mainContentBox = createMainContentBox();
         getDialogPane().setContent(mainContentBox);
 
-        // ✅ Apply dark/light theme dynamically
-        // Platform.runLater(() -> ThemeManager.apply(getDialogPane().getScene()));
     }
 
     private VBox createMainContentBox() {
@@ -76,6 +77,29 @@ public class CreateOrEditTransactionDialog extends CustomDialog {
         transactionDatePicker.setPromptText("Enter Transaction Date");
         transactionDatePicker.getStyleClass().addAll("field-background", "text-light-gray", "text-size-md", "rounded-border");
         transactionDatePicker.setMaxWidth(Double.MAX_VALUE);
+        
+        hourBox = new ComboBox<>();
+        for (int i = 1; i <= 12; i++) {
+            hourBox.getItems().add(String.format("%02d", i));
+        }
+        hourBox.setPromptText("Hour");
+        hourBox.getStyleClass().addAll("field-background", "text-light-gray", "text-size-md", "rounded-border");
+
+        minuteBox = new ComboBox<>();
+        for (int i = 0; i < 60; i += 5) {
+            minuteBox.getItems().add(String.format("%02d", i));
+        }
+        minuteBox.setPromptText("Minute");
+        minuteBox.getStyleClass().addAll("field-background", "text-light-gray", "text-size-md", "rounded-border");
+
+        amPmBox = new ComboBox<>(FXCollections.observableArrayList("AM", "PM"));
+        amPmBox.setPromptText("AM/PM");
+        amPmBox.getStyleClass().addAll("field-background", "text-light-gray", "text-size-md", "rounded-border");
+
+        HBox timePickerBox = new HBox(15, new Label("Time: "), hourBox, minuteBox, amPmBox);
+        timePickerBox.setAlignment(Pos.CENTER_LEFT);
+        Label timeLabel = (Label) timePickerBox.getChildren().get(0);
+        timeLabel.getStyleClass().addAll("text-light-gray", "text-size-md");
 
         transactionCategoryBox = new ComboBox<>();
         transactionCategoryBox.setPromptText("Choose Category");
@@ -91,6 +115,19 @@ public class CreateOrEditTransactionDialog extends CustomDialog {
             transactionNameField.setText(t.getTransactionName());
             transactionAmountField.setText(String.valueOf(t.getTransactionAmount()));
             transactionDatePicker.setValue(t.getTransactionDate());
+            if (t.getTransactionTime() != null && !t.getTransactionTime().isEmpty()) {
+                try {
+                    String[] parts = t.getTransactionTime().split(" ");
+                    if (parts.length == 2) {
+                        String[] timeParts = parts[0].split(":");
+                        if (timeParts.length == 2) {
+                            hourBox.setValue(timeParts[0]);
+                            minuteBox.setValue(timeParts[1]);
+                        }
+                        amPmBox.setValue(parts[1]);
+                    }
+                } catch (Exception ignored) {}
+            }
 
             if (t.getTransactionCategory() != null)
                 transactionCategoryBox.setValue(t.getTransactionCategory().getCategoryName());
@@ -100,6 +137,7 @@ public class CreateOrEditTransactionDialog extends CustomDialog {
                 transactionNameField,
                 transactionAmountField,
                 transactionDatePicker,
+                timePickerBox,
                 transactionCategoryBox,
                 createTransactionTypeRadioButtonGroup(),
                 createConfirmAndCancelButtonsBox()
@@ -158,15 +196,24 @@ public class CreateOrEditTransactionDialog extends CustomDialog {
             txData.addProperty("id", transactionComponent.getTransaction().getId());
         }
 
-        // Extract values
         String name = transactionNameField.getText().trim();
         String rawAmount = transactionAmountField.getText().trim();
         LocalDate date = transactionDatePicker.getValue();
+        
+        String hr = hourBox.getValue();
+        String min = minuteBox.getValue();
+        String amPm = amPmBox.getValue();
+        String time;
+        if (hr == null || min == null || amPm == null) {
+            time = "12:00 PM";
+        } else {
+            time = hr + ":" + min + " " + amPm;
+        }
+        
         Toggle selectedToggle = transactionTypeToggleGroup.getSelectedToggle();
         String type = selectedToggle == null ? null : ((RadioButton) selectedToggle).getText();
         String categoryName = transactionCategoryBox.getValue();
 
-        // Validate entries
         if (name.isEmpty() || rawAmount.isEmpty() || date == null || type == null) {
             Utilitie.showAlertDialog(Alert.AlertType.WARNING, "Please fill all required fields.");
             return;
@@ -177,6 +224,7 @@ public class CreateOrEditTransactionDialog extends CustomDialog {
             txData.addProperty("transactionName", name);
             txData.addProperty("transactionAmount", amount);
             txData.addProperty("transactionDate", date.format(DateTimeFormatter.ISO_LOCAL_DATE));
+            txData.addProperty("transactionTime", time);
             txData.addProperty("transactionType", type);
 
             if (categoryName != null && !categoryName.isEmpty()) {
@@ -200,7 +248,7 @@ public class CreateOrEditTransactionDialog extends CustomDialog {
                 Utilitie.showAlertDialog(Alert.AlertType.INFORMATION,
                         isEditing ? "Transaction updated!" : "Transaction created!");
 
-                dashboardController.fetchUserData(); // ✅ Refresh dashboard
+                dashboardController.fetchUserData(); 
                 this.close();
             } else {
                 Utilitie.showAlertDialog(Alert.AlertType.ERROR,

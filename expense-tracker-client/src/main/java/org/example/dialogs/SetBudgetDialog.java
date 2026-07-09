@@ -74,9 +74,6 @@ public class SetBudgetDialog extends Dialog<Budget> {
 
         getDialogPane().setContent(form);
 
-        // ✅ Apply theme when dialog appears
-        // Platform.runLater(() -> ThemeManager.apply(getDialogPane().getScene()));
-
         periodTypeCombo.valueProperty().addListener((obs, o, n) -> {
             updatePeriodValueItems(n);
             autoPickLatestPeriod(categoryCombo.getValue());
@@ -85,7 +82,6 @@ public class SetBudgetDialog extends Dialog<Budget> {
         categoryCombo.valueProperty().addListener((obs, o, n) -> autoPickLatestPeriod(n));
         yearSpinner.valueProperty().addListener((obs, o, n) -> autoPickLatestPeriod(categoryCombo.getValue()));
 
-        // Initial setup
         if (toEdit == null) {
             updatePeriodValueItems(Budget.PeriodType.MONTHLY);
             autoPickLatestPeriod(null);

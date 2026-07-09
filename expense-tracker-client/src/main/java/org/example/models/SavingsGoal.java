@@ -3,15 +3,10 @@ package org.example.models;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-/**
- * Front-end POJO for a Savings Goal.
- * We keep userId only (back-end receives a nested user object
- * created inside SavingsGoalUtil when sending JSON).
- */
 public class SavingsGoal {
 
     private int id;
-    private int userId;                 // owner
+    private int userId;                 
     private String name;
 
     private BigDecimal targetAmount;
@@ -20,9 +15,7 @@ public class SavingsGoal {
 
     private boolean completed;
 
-    /* ----------  Constructors  ---------- */
-
-    public SavingsGoal() { /* default */ }
+    public SavingsGoal() {  }
 
     public SavingsGoal(String name,
                        BigDecimal targetAmount,
@@ -34,8 +27,6 @@ public class SavingsGoal {
         this.deadline = deadline;
         this.completed = false;
     }
-
-    /* ----------  Getters / Setters  ---------- */
 
     public int getId()               { return id; }
     public void setId(int id)        { this.id = id; }
@@ -57,8 +48,6 @@ public class SavingsGoal {
 
     public boolean isCompleted()     { return completed; }
     public void setCompleted(boolean completed) { this.completed = completed; }
-
-    /* ----------  Convenience  ---------- */
 
     @Override
     public String toString() {

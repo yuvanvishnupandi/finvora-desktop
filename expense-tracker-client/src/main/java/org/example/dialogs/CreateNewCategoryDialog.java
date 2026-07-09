@@ -25,8 +25,6 @@ public class CreateNewCategoryDialog extends CustomDialog {
         VBox dialogContentBox = createDialogContentBox();
         getDialogPane().setContent(dialogContentBox);
 
-        // ✅ Apply theme AFTER the dialog is fully loaded
-        // Platform.runLater(() -> ThemeManager.apply(getDialogPane().getScene()));
     }
 
     private VBox createDialogContentBox() {

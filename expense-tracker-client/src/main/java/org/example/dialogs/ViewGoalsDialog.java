@@ -42,8 +42,6 @@ public class ViewGoalsDialog extends Dialog<Void> {
         scrollPane.setFitToWidth(true);
         pane.setContent(scrollPane);
 
-        // ✅ Apply dark/light theme dynamically
-        // Platform.runLater(() -> ThemeManager.apply(getDialogPane().getScene()));
     }
 
     private VBox createGoalNode(SavingsGoal goal) {

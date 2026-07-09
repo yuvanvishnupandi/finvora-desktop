@@ -17,10 +17,9 @@ public class ViewOrEditTransactionCategoryDialog extends CustomDialog{
         super(user);
         this.dashboardController = dashboardController;
 
-        // configure the dialog
         setTitle("View Categories");
-        setWidth(815);
-        setHeight(500);
+        setWidth(1000);
+        setHeight(700);
 
         ScrollPane mainContainer = createMainContainerContent();
         getDialogPane().setContent(mainContainer);
@@ -42,13 +41,3 @@ public class ViewOrEditTransactionCategoryDialog extends CustomDialog{
         return scrollPane;
     }
 }
-
-
-
-
-
-
-
-
-
-

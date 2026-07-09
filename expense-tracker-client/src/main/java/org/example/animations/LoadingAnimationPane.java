@@ -36,16 +36,3 @@ public class LoadingAnimationPane extends Pane {
         setMinHeight(newHeight);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

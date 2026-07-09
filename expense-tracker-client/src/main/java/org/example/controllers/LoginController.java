@@ -48,12 +48,11 @@ public class LoginController {
     }
 
     private boolean validateUser(){
-        // empty username
+        
         if(loginView.getUsernameField().getText().isEmpty()){
             return false;
         }
 
-        // empty password
         if(loginView.getPasswordField().getText().isEmpty()){
             return false;
         }
@@ -61,10 +60,3 @@ public class LoginController {
         return true;
     }
 }
-
-
-
-
-
-
-

@@ -14,6 +14,7 @@ private Integer id;
 // IMPORTANT: adjust the import below if your User entity is in a different package
 @ManyToOne(optional = false, fetch = FetchType.LAZY)
 @JoinColumn(name = "user_id")
+@com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
 private User user;
 
 @Column(nullable = false, length = 90)

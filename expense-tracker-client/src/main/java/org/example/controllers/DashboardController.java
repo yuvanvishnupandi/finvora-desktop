@@ -1,4 +1,3 @@
-// File: expense-tracker-client/src/main/java/org/example/controllers/DashboardController.java
 package org.example.controllers;
 
 import javafx.collections.FXCollections;
@@ -38,6 +37,7 @@ import org.example.utils.ThemeManager;
 import org.example.views.BudgetProgressView;
 import org.example.views.DashboardView;
 import org.example.views.LoginView;
+import org.example.services.AIVoiceService;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,32 +71,67 @@ public class DashboardController {
     public void fetchUserData() {
         view.getLoadingAnimationPane().setVisible(true);
 
-        user = SqlUtil.getUserByEmail(view.getEmail());
+        try {
+            user = SqlUtil.getUserByEmail(view.getEmail());
 
-        // Setting user details
-        if (user != null) {
-            String nm = user.getName() == null ? "" : user.getName();
-            String em = user.getEmail() == null ? "" : user.getEmail();
+            if (user != null) {
+                String nm = user.getName() == null ? "" : user.getName();
+                String em = user.getEmail() == null ? "" : user.getEmail();
+                
+                view.getUserNameLabel().setText(nm);
+                view.getUserEmailLabel().setText("<" + em + ">");
+            }
+
+            loadYears();
+            pickActiveBudgetFromStore();
+            loadBalances();
+            view.getTransactionTable().setItems(calcMonthly());
+            loadRecents();
+            refreshGoalWidget(); 
             
-            view.getUserNameLabel().setText(nm);
-            view.getUserEmailLabel().setText("<" + em + ">");
+            // Run AI Proactive Monitor asynchronously
+            new Thread(() -> {
+                try {
+                    List<Transaction> allTx = SqlUtil.getAllTransactionsByUserId(user.getId(), currentYear, null);
+                    List<org.example.models.Budget> budgets = org.example.utils.BudgetStore.getBudgets(user.getId());
+                    if (budgets != null) {
+                        for (org.example.models.Budget b : budgets) {
+                            b.setSpentAmount(calculateSpentFor(b));
+                        }
+                    }
+                    List<String> alerts = org.example.services.AIProactiveMonitor.analyzeTransactions(allTx, budgets);
+                    javafx.application.Platform.runLater(() -> {
+                        view.aiAlertsButton.setText("🔔 AI Alerts (" + alerts.size() + ")");
+                        if (!alerts.isEmpty()) {
+                            view.aiAlertsButton.setStyle("-fx-background-color: transparent; -fx-text-fill: #e13742; -fx-font-weight: bold; -fx-cursor: hand;");
+                            view.aiAlertsButton.setOnAction(e -> {
+                                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+                                alert.setTitle("Proactive AI Alerts");
+                                alert.setHeaderText("Finvora AI found " + alerts.size() + " anomalies/insights in your recent spending:");
+                                alert.setContentText(String.join("\n\n", alerts));
+                                alert.showAndWait();
+                            });
+                        }
+                    });
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }).start();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            view.getLoadingAnimationPane().setVisible(false);
         }
-
-        loadYears();
-        pickActiveBudgetFromStore();
-        loadBalances();
-        view.getTransactionTable().setItems(calcMonthly());
-        loadRecents();
-        refreshGoalWidget(); // Ensure this runs to update the widget
-        
-        view.getLoadingAnimationPane().setVisible(false);
     }
 
     private void loadYears() {
         List<Integer> years = SqlUtil.getAllDistinctYears(user.getId());
-        for (Integer y : years)
-            if (!view.getYearComboBox().getItems().contains(y))
-                view.getYearComboBox().getItems().add(y);
+        if (years != null) {
+            for (Integer y : years)
+                if (!view.getYearComboBox().getItems().contains(y))
+                    view.getYearComboBox().getItems().add(y);
+        }
 
         ObservableList<String> monthOptions = FXCollections.observableArrayList(
                 "ALL", "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
@@ -129,17 +164,12 @@ public class DashboardController {
         view.getTotalExpense().setText("₹" + out);
         view.getCurrentBalance().setText("₹" + bal);
 
-        // --- APPLYING CSS CLASSES FOR THEME CONSISTENCY ---
-        
-        // 1. Total Income (Always Green)
         view.getTotalIncome().getStyleClass().removeAll("text-light-red", "text-light-green");
         view.getTotalIncome().getStyleClass().add("text-light-green");
 
-        // 2. Total Expense (Always Red)
         view.getTotalExpense().getStyleClass().removeAll("text-light-red", "text-light-green");
         view.getTotalExpense().getStyleClass().add("text-light-red");
         
-        // 3. Current Balance (Dynamic Color)
         view.getCurrentBalance().getStyleClass().removeAll("text-light-green", "text-light-red");
         if (bal.compareTo(BigDecimal.ZERO) < 0) {
             view.getCurrentBalance().getStyleClass().add("text-light-red");
@@ -147,13 +177,12 @@ public class DashboardController {
             view.getCurrentBalance().getStyleClass().add("text-light-green");
         }
         
-        // 4. Budget Status (Dynamic Color)
         view.getBudgetRemaining().getStyleClass().removeAll("text-light-green", "text-light-red", "text-light-gray");
 
         if (currentBudget == null) {
             view.getBudgetStatusLabel().setText("No Budget Set Yet");
             view.getBudgetRemaining().setText("—");
-            view.getBudgetRemaining().getStyleClass().add("text-light-gray"); // Use light gray for "no budget"
+            view.getBudgetRemaining().getStyleClass().add("text-light-gray"); 
         } else {
             currentBudget.setSpentAmount(calculateSpentFor(currentBudget));
             BigDecimal remaining = currentBudget.getRemaining().setScale(2, RoundingMode.HALF_UP);
@@ -167,7 +196,20 @@ public class DashboardController {
                 view.getBudgetStatusLabel().setText("Budget Remaining:");
             }
         }
-        // --- END CSS CLASS APPLICATION ---
+        
+        List<org.example.models.SavingsGoal> goals = org.example.utils.GoalStore.getGoals(user.getId());
+        if (goals != null && !goals.isEmpty()) {
+            org.example.models.SavingsGoal g = goals.get(0);
+            view.getTopGoalNameLabel().setText(g.getName() + " (₹" + g.getCurrentAmount() + " / ₹" + g.getTargetAmount() + ")");
+            double pct = 0;
+            if (g.getTargetAmount() != null && g.getTargetAmount().doubleValue() > 0) {
+                pct = g.getCurrentAmount().divide(g.getTargetAmount(), 4, RoundingMode.HALF_UP).doubleValue();
+            }
+            view.getTopGoalProgressBar().setProgress(Math.min(1.0, pct));
+        } else {
+            view.getTopGoalNameLabel().setText("No Active Goals");
+            view.getTopGoalProgressBar().setProgress(0);
+        }
     }
 
     private ObservableList<MonthlyFinance> calcMonthly() {
@@ -195,25 +237,29 @@ public class DashboardController {
 
     private void loadRecents() {
         view.getRecentTransactionBox().getChildren().clear();
-        List<Transaction> recent = SqlUtil.getRecentTransactionByUserId(user.getId(), 0, 0, recentTransactionSize);
-        if (recent != null)
+        
+        List<Transaction> recent = SqlUtil.getRecentTransactionByUserId(user.getId(), 0, 0, 500);
+        
+        if (recent != null) {
+            recent.sort((t1, t2) -> {
+                int cmp = t2.getTransactionDate().compareTo(t1.getTransactionDate());
+                if (cmp == 0) cmp = Integer.compare(t2.getId(), t1.getId());
+                return cmp;
+            });
             for (Transaction t : recent)
                 view.getRecentTransactionBox().getChildren().add(new TransactionComponent(this, t));
+        }
     }
 
     private void initListeners() {
-        // NOTE ON DELETION: The ViewOrEditTransactionCategoryDialog needs 'this' 
-        // controller reference to call fetchUserData() after a successful delete/edit
         view.getCreateCategoryMenuItem().setOnAction(e -> new CreateNewCategoryDialog(user).showAndWait());
         view.getViewCategoriesMenuItem().setOnAction(e -> new ViewOrEditTransactionCategoryDialog(user, this).showAndWait());
 
         view.getAddGoalMenuItem().setOnAction(e -> addGoal());
         view.getViewGoalsMenuItem().setOnAction(e -> seeGoals());
         
-        // ADDED: About Us Listener
         view.getAboutUsMenuItem().setOnAction(e -> showAboutUs());
 
-        // Budget
         view.getSetMonthlyBudgetsMenuItem().setOnAction(e -> {
             Optional<Budget> budget = new SetBudgetDialog(user).showAndWait();
             budget.ifPresent(b -> {
@@ -240,10 +286,8 @@ public class DashboardController {
             }
         });
 
-        // Currency converter (menu before Logout)
         view.getConvertCurrencyMenuItem().setOnAction(e -> new CurrencyConverterDialog().showAndWait());
 
-        // Export CSV
         view.getExportDataMenuItem().setOnAction(e -> {
             ExportDataDialog dlg = new ExportDataDialog(user);
             ExportDataDialog.ExportOptions opt = dlg.showAndWait().orElse(null);
@@ -264,7 +308,6 @@ public class DashboardController {
             }
         });
 
-        // Generate PDF
         view.getGeneratePdfReportMenuItem().setOnAction(e -> {
             ExportDataDialog dlg = new ExportDataDialog(user);
             ExportDataDialog.ExportOptions opt = dlg.showAndWait().orElse(null);
@@ -287,13 +330,10 @@ public class DashboardController {
             }
         });
 
-        // Logout
         view.getLogoutMenuItem().setOnAction(e -> {
-            ThemeManager.setDark(false);
             new LoginView().show();
         });
 
-        // Filters
         view.getYearComboBox().setOnAction((ActionEvent e) -> {
             currentYear = view.getYearComboBox().getValue();
             fetchUserData();
@@ -307,9 +347,93 @@ public class DashboardController {
             });
         }
 
-        // Add transaction / view chart / open month detail
         view.getAddTransactionButton().setOnMouseClicked(
                 (MouseEvent e) -> new CreateOrEditTransactionDialog(this, false).showAndWait());
+                
+        view.scanReceiptButton.setOnAction(e -> {
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Select Receipt Image or Document");
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Receipts", "*.jpg", "*.pdf"));
+            File img = fc.showOpenDialog(view.getAddTransactionButton().getScene().getWindow());
+            if (img != null) {
+                view.getAiStatusLabel().setText("AI Vision: Extracting receipt data...");
+                new Thread(() -> {
+                    try {
+                        com.google.gson.JsonObject result = org.example.services.AIVisionService.processReceipt(img);
+                        javafx.application.Platform.runLater(() -> {
+                            try {
+                                com.google.gson.JsonObject tJson = new com.google.gson.JsonObject();
+                                
+                                String vendor = result.has("vendorName") && !result.get("vendorName").isJsonNull() ? result.get("vendorName").getAsString() : "Scanned Receipt";
+                                
+                                double amount = 0.0;
+                                if (result.has("totalAmount") && !result.get("totalAmount").isJsonNull()) {
+                                    String amtStr = result.get("totalAmount").getAsString().replaceAll("[^0-9.]", "");
+                                    try { amount = Double.parseDouble(amtStr); } catch (Exception ignored) {}
+                                }
+                                
+                                String date = java.time.LocalDate.now().toString();
+                                if (result.has("date") && !result.get("date").isJsonNull()) {
+                                    String dStr = result.get("date").getAsString();
+                                    try {
+                                        // Attempt to parse YYYY-MM-DD
+                                        java.time.LocalDate.parse(dStr);
+                                        date = dStr;
+                                    } catch (Exception ignored) {
+                                        try {
+                                            // Attempt DD-MM-YYYY
+                                            String[] parts = dStr.split("[-/]");
+                                            if (parts.length == 3) {
+                                                if (parts[0].length() == 4) date = parts[0] + "-" + parts[1] + "-" + parts[2];
+                                                else date = parts[2] + "-" + parts[1] + "-" + parts[0];
+                                            }
+                                        } catch (Exception ignored2) {}
+                                    }
+                                }
+                                
+                                String categoryName = result.has("category") && !result.get("category").isJsonNull() ? result.get("category").getAsString() : "Uncategorized";
+                                
+                                tJson.addProperty("transactionName", vendor);
+                                tJson.addProperty("transactionAmount", amount);
+                                tJson.addProperty("transactionType", "expense");
+                                tJson.addProperty("transactionDate", date);
+                                
+                                org.example.models.TransactionCategory targetCat = null;
+                                java.util.List<org.example.models.TransactionCategory> cats = org.example.utils.SqlUtil.getAllTransactionCategoriesByUser(user);
+                                if (cats != null) {
+                                    for(org.example.models.TransactionCategory c : cats) {
+                                        if(c.getCategoryName().equalsIgnoreCase(categoryName)) {
+                                            targetCat = c;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (targetCat == null && cats != null && !cats.isEmpty()) targetCat = cats.get(0);
+                                if (targetCat != null) {
+                                    com.google.gson.JsonObject catObj = new com.google.gson.JsonObject();
+                                    catObj.addProperty("id", targetCat.getId());
+                                    tJson.add("transactionCategory", catObj);
+                                }
+                                
+                                com.google.gson.JsonObject userObj = new com.google.gson.JsonObject();
+                                userObj.addProperty("id", user.getId());
+                                tJson.add("user", userObj);
+                                
+                                org.example.utils.SqlUtil.postTransaction(tJson);
+                                view.getAiStatusLabel().setText("AI Vision: Receipt parsed successfully!");
+                                fetchUserData();
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                                view.getAiStatusLabel().setText("AI Vision: Missing or invalid fields in receipt.");
+                            }
+                        });
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        javafx.application.Platform.runLater(() -> view.getAiStatusLabel().setText("AI Vision: Failed to read receipt."));
+                    }
+                }).start();
+            }
+        });
 
         view.getViewChartButton().setOnAction(
                 e -> new ViewChartDialog(user, view.getTransactionTable().getItems(), currentYear).showAndWait());
@@ -322,19 +446,184 @@ public class DashboardController {
             });
             return row;
         });
+
+        AIVoiceService voiceService = new AIVoiceService();
+
+        view.getSendBtn().setOnAction(e -> {
+            String text = view.getChatInput().getText();
+            if(!text.isEmpty()){
+                view.getAiStatusLabel().setText("Finvora AI is processing your request...");
+                String context = buildDeepContext();
+                
+                voiceService.processTextDirectly(text, context, "Professional",
+                    status -> javafx.application.Platform.runLater(() -> view.getAiStatusLabel().setText(status)),
+                    advice -> javafx.application.Platform.runLater(() -> view.getAiAdviceArea().setText(advice)),
+                    intentJson -> handleIntent(intentJson)
+                );
+                view.getChatInput().clear();
+            } else {
+                view.getAiStatusLabel().setText("Please type a message first.");
+            }
+        });
+
+        view.getVoiceBtn().setOnAction(e -> {
+            if (view.getVoiceBtn().isSelected()) {
+                voiceService.startRecording();
+                view.getAiStatusLabel().setText("Listening... (Click Voice again to send)");
+            } else {
+                view.getAiStatusLabel().setText("Processing voice...");
+                String context = buildDeepContext();
+                voiceService.stopRecordingAndProcess(context, "Professional",
+                    status -> javafx.application.Platform.runLater(() -> view.getAiStatusLabel().setText(status)),
+                    advice -> javafx.application.Platform.runLater(() -> view.getAiAdviceArea().setText(advice)),
+                    intentJson -> handleIntent(intentJson)
+                );
+            }
+        });
+    }
+
+    private String buildDeepContext() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Balance: %s, Income: %s, Expense: %s, Budget: %s. ", 
+                view.getCurrentBalance().getText(), view.getTotalIncome().getText(), 
+                view.getTotalExpense().getText(), view.getBudgetRemaining().getText()));
+        
+        java.util.List<org.example.models.Transaction> recents = org.example.utils.SqlUtil.getRecentTransactionByUserId(user.getId(), 0, 0, 15);
+        if (recents != null && !recents.isEmpty()) {
+            sb.append("Recent Transactions: ");
+            for (org.example.models.Transaction t : recents) {
+                sb.append(String.format("[%s, %s, %s, %s], ", t.getTransactionDate(), t.getTransactionType(), t.getTransactionAmount(), t.getTransactionCategory() != null ? t.getTransactionCategory().getCategoryName() : ""));
+            }
+        }
+        
+        java.util.List<org.example.models.Budget> budgets = org.example.utils.BudgetStore.getBudgets(user.getId());
+        if (budgets != null && !budgets.isEmpty()) {
+            sb.append("Budgets: ");
+            for (org.example.models.Budget b : budgets) {
+                sb.append(String.format("[%s limit %s spent %s], ", b.getCategory(), b.getLimitAmount(), b.getSpentAmount()));
+            }
+        }
+        
+        java.util.List<org.example.models.SavingsGoal> goals = org.example.utils.GoalStore.getGoals(user.getId());
+        if (goals != null && !goals.isEmpty()) {
+            sb.append("Savings Goals: ");
+            for (org.example.models.SavingsGoal g : goals) {
+                sb.append(String.format("[%s target %s saved %s deadline %s], ", g.getName(), g.getTargetAmount(), g.getCurrentAmount(), g.getDeadline()));
+            }
+        }
+        
+        return sb.toString();
+    }
+    
+    private void handleIntent(String intentJsonStr) {
+        javafx.application.Platform.runLater(() -> {
+            try {
+                // First, try to clean the intentJsonStr if it has markdown block ```json ... ```
+                String cleanJson = intentJsonStr.trim();
+                if (cleanJson.startsWith("```json")) {
+                    cleanJson = cleanJson.substring(7);
+                } else if (cleanJson.startsWith("```")) {
+                    cleanJson = cleanJson.substring(3);
+                }
+                if (cleanJson.endsWith("```")) {
+                    cleanJson = cleanJson.substring(0, cleanJson.length() - 3);
+                }
+                cleanJson = cleanJson.trim();
+                
+                com.google.gson.JsonObject root = com.google.gson.JsonParser.parseString(cleanJson).getAsJsonObject();
+                if (!root.has("intent")) return;
+                
+                String intent = root.get("intent").getAsString();
+                com.google.gson.JsonObject data = root.has("data") ? root.get("data").getAsJsonObject() : new com.google.gson.JsonObject();
+                
+                if ("ADD_TRANSACTION".equalsIgnoreCase(intent)) {
+                    double amount = data.has("amount") ? data.get("amount").getAsDouble() : 0;
+                    String categoryName = data.has("category") && !data.get("category").getAsString().trim().isEmpty() ? data.get("category").getAsString() : "Uncategorized";
+                    String type = data.has("type") ? data.get("type").getAsString() : "expense";
+                    String name = data.has("name") && !data.get("name").getAsString().trim().isEmpty() ? data.get("name").getAsString() : "AI Transaction";
+                    
+                    if (amount > 0 && !type.isEmpty()) {
+                        org.example.models.TransactionCategory targetCat = null;
+                        java.util.List<org.example.models.TransactionCategory> cats = org.example.utils.SqlUtil.getAllTransactionCategoriesByUser(user);
+                        if (cats != null) {
+                            for(org.example.models.TransactionCategory c : cats) {
+                                if(c.getCategoryName().equalsIgnoreCase(categoryName)) {
+                                    targetCat = c;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        if (targetCat == null) {
+                            com.google.gson.JsonObject catJson = new com.google.gson.JsonObject();
+                            catJson.addProperty("categoryName", categoryName);
+                            catJson.addProperty("categoryColor", "1E293B");
+                            com.google.gson.JsonObject catUserObj = new com.google.gson.JsonObject();
+                            catUserObj.addProperty("id", user.getId());
+                            catJson.add("user", catUserObj);
+                            org.example.utils.SqlUtil.postTransactionCategory(catJson);
+                            
+                            cats = org.example.utils.SqlUtil.getAllTransactionCategoriesByUser(user);
+                            if (cats != null) {
+                                for(org.example.models.TransactionCategory c : cats) {
+                                    if(c.getCategoryName().equalsIgnoreCase(categoryName)) {
+                                        targetCat = c;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if (targetCat != null) {
+                            com.google.gson.JsonObject tJson = new com.google.gson.JsonObject();
+                            tJson.addProperty("transactionName", name);
+                            tJson.addProperty("transactionAmount", amount);
+                            tJson.addProperty("transactionType", type.toLowerCase());
+                            String date = data.has("date") && !data.get("date").getAsString().isEmpty() ? data.get("date").getAsString() : java.time.LocalDate.now().toString();
+                            tJson.addProperty("transactionDate", date);
+                            
+                            com.google.gson.JsonObject tCatObj = new com.google.gson.JsonObject();
+                            tCatObj.addProperty("id", targetCat.getId());
+                            tJson.add("transactionCategory", tCatObj);
+                            
+                            com.google.gson.JsonObject tUserObj = new com.google.gson.JsonObject();
+                            tUserObj.addProperty("id", user.getId());
+                            tJson.add("user", tUserObj);
+                            
+                            org.example.utils.SqlUtil.postTransaction(tJson);
+                        }
+                        
+                        fetchUserData(); // Refresh dashboard
+                        view.getAiStatusLabel().setText("Transaction added automatically!");
+                    }
+                } else if ("NAVIGATION".equalsIgnoreCase(intent)) {
+                    String target = data.has("target") ? data.get("target").getAsString() : "";
+                    if ("BUDGETS".equalsIgnoreCase(target)) {
+                        view.getViewBudgetProgressMenuItem().fire();
+                    } else if ("CATEGORIES".equalsIgnoreCase(target)) {
+                        view.getViewCategoriesMenuItem().fire();
+                    } else if ("GOALS".equalsIgnoreCase(target)) {
+                        view.getViewGoalsMenuItem().fire();
+                    } else if ("REPORT".equalsIgnoreCase(target)) {
+                        view.getExportDataMenuItem().fire();
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                System.err.println("Failed to parse intent: " + intentJsonStr);
+            }
+        });
     }
 
     private void showAboutUs() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         
-        // --- SETTING TITLE AND HEADER CLEANLY ---
         alert.setTitle("Project Information");
-        alert.setHeaderText("Finance Tracker"); 
+        alert.setHeaderText("Finvora - Finance Tracker"); 
 
-        // --- ORDERED AND CLEAN CONTENT ---
         String content = 
             "PROJECT IDENTITY:\n" +
-            "Finance Tracker\n\n" +
+            "Finvora - Finance Tracker\n\n" +
 
             "PROJECT SUMMARY:\n" +
             "A modern desktop application built on JavaFX for local expense tracking, budgeting, and goal setting. Features a responsive, dual-theme user interface.\n\n" +
@@ -352,20 +641,14 @@ public class DashboardController {
             "2. Sundar Dinesh (Frontend Tester)\n" +
             "3. Yashawini (Frontend Tester)\n";
 
-        // Using TextArea for clean formatting and scrollability
         TextArea textArea = new TextArea(content);
         textArea.setEditable(false);
         textArea.setWrapText(true);
 
-        // Set the dialog content
         alert.getDialogPane().setContent(textArea);
         
-        // NOTE: Since universal light dialog styling is in style.css, 
-        // we rely on that to apply the clean white look.
-
         alert.showAndWait();
     }
-
 
     private void generatePdfReport(LocalDate start, LocalDate end, File outFile) throws IOException {
         List<Integer> years = SqlUtil.getAllDistinctYears(user.getId());
@@ -405,7 +688,7 @@ public class DashboardController {
             PDPageContentStream cs = new PDPageContentStream(doc, page);
 
             y = drawText(cs, x, y, PDType1Font.HELVETICA_BOLD, 16,
-                    "Finance Tracker Report – " + (user != null ? user.getEmail() : ""));
+                    "Finvora - Finance Tracker Report – " + (user != null ? user.getEmail() : ""));
             y = drawText(cs, x, y - 6, PDType1Font.HELVETICA, 10,
                     "Date range: " + (start == null ? "All" : start.toString())
                             + " to " + (end == null ? "All" : end.toString()));
@@ -545,9 +828,8 @@ public class DashboardController {
     private void addGoal() {
         Optional<SavingsGoal> res = new CreateGoalDialog().showAndWait();
         res.ifPresent(goal -> {
-            goal.setId(GoalStore.nextId(user.getId()));
             GoalStore.add(user.getId(), goal);
-            new Alert(Alert.AlertType.INFORMATION, "Goal saved (session only).").showAndWait();
+            new Alert(Alert.AlertType.INFORMATION, "Goal saved successfully!").showAndWait();
             refreshGoalWidget();
         });
     }
@@ -561,32 +843,25 @@ public class DashboardController {
     private void refreshGoalWidget() {
         List<SavingsGoal> goals = GoalStore.getGoals(user.getId());
         
-        // FIX: Check if goals list is empty or null and update display accordingly.
         if (goals == null || goals.isEmpty()) {
-            // Set a helpful message for the empty state
             view.getTopGoalNameLabel().setText("Check Menu to Set Goal");
-            view.getTopGoalProgressBar().setProgress(0); // Set progress to 0 
+            view.getTopGoalProgressBar().setProgress(0); 
             
-            // Apply CSS class to style the text clearly (defined in style.css)
             view.getTopGoalNameLabel().getStyleClass().add("empty-goal-state"); 
             return;
         }
         
-        // If goals exist, display the first one (most relevant)
         SavingsGoal g = goals.get(0);
         
-        // Remove the empty state CSS class if it was present
         view.getTopGoalNameLabel().getStyleClass().removeAll("empty-goal-state");
         
-        // Calculate progress as a double (0.0 to 1.0)
         double p = 0;
         try {
             if (g.getTargetAmount() != null && g.getTargetAmount().doubleValue() > 0)
                 p = g.getCurrentAmount().divide(g.getTargetAmount(), 4, RoundingMode.HALF_UP).doubleValue();
         } catch (Exception ignored) {}
         
-        // Update the dashboard widget with the goal details
-        view.getTopGoalNameLabel().setText("🏆 " + g.getName()); // Use the goal name
+        view.getTopGoalNameLabel().setText("🏆 " + g.getName()); 
         view.getTopGoalProgressBar().setProgress(Math.min(1.0, p));
     }
 
