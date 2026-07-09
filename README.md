@@ -75,14 +75,12 @@ graph TD
 ### Frontend (Client)
 - JavaFX
 - Maven
-- Gson
 - Apache PDFBox
 - JavaFX MediaPlayer
 
 ### Backend (Server)
 - Spring Boot (Java 17)
-- Spring Data JPA & Hibernate
-- H2 Database
+- Spring Data JPA 
 
 ## Prerequisites
 
