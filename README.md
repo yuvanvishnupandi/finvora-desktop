@@ -1,4 +1,4 @@
-# Finvora - AI Finanace Manager
+# Finvora - AI Finanace Personal Manager
 
 ![Finvora Dashboard](assets/dashboard.png)
 
