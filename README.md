@@ -146,7 +146,7 @@ Compile and run the Spring Boot backend server and the JavaFX frontend client. D
 
 <td align="center" width="180" height="180">
 <a href="https://openjfx.io/">
-  <img src="https://skillicons.dev/icons?i=java" width="90"/><br><br>
+   <img src="./assets/javafxlogo.webp" alt="OpenAI" width="900"/>
   <b>JavaFX</b>
 </a>
 </td>
@@ -164,7 +164,7 @@ Compile and run the Spring Boot backend server and the JavaFX frontend client. D
 
 <td align="center" width="180" height="180">
 <a href="https://www.h2database.com/">
-<img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/h2database.svg" width="90"/><br><br>
+<img src="https://www.h2database.com/html/images/h2-logo-2.png" width="90"/><br><br>
 <b>H2 Database</b>
 </a>
 </td>
@@ -178,7 +178,7 @@ Compile and run the Spring Boot backend server and the JavaFX frontend client. D
 
 <td align="center" width="180" height="180">
 <a href="https://openai.com/">
-<img src="https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white"/>
+  <img src="./assets/openai.jpg" alt="OpenAI" width="900"/>
 </a>
 </td>
 
