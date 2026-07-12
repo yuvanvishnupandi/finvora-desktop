@@ -4,17 +4,50 @@
 
 <br />
 
-<div align="center">
-<p>A production-grade, AI-powered personal finance tracker — with multi-LLM interactions, voice-activated logging, automated receipt scanning, and robust wealth management.</p>
-<br />
+<p align="center">
 
-<a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/License-MIT-8B5CF6?style=flat-square&labelColor=1F2937" /></a>
- 
-<a href="https://github.com/yuvanvishnupandi/Finance_Tracker_APP/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/yuvanvishnupandi/Finance_Tracker_APP?style=flat-square&color=F59E0B&labelColor=1F2937&label=Stars" /></a>
- 
-<a href="https://github.com/yuvanvishnupandi/Finance_Tracker_APP/commits/main"><img alt="Last Commit" src="https://img.shields.io/github/last-commit/yuvanvishnupandi/Finance_Tracker_APP?style=flat-square&color=22C55E&labelColor=1F2937&label=Last%20Commit" /></a>
+<a href="LICENSE">
+  <img src="https://img.shields.io/badge/License-MIT-8B5CF6?style=for-the-badge&logo=open-source-initiative&logoColor=white" alt="License"/>
+</a>
 
-</div>
+<a href="https://github.com/yuvanvishnupandi/Finance_Tracker_APP/stargazers">
+  <img src="https://img.shields.io/github/stars/yuvanvishnupandi/Finance_Tracker_APP?style=for-the-badge&logo=github&color=FBBF24&labelColor=111827&label=Stars" alt="Stars"/>
+</a>
+
+<a href="https://github.com/yuvanvishnupandi/Finance_Tracker_APP/network/members">
+  <img src="https://img.shields.io/github/forks/yuvanvishnupandi/Finance_Tracker_APP?style=for-the-badge&logo=github&color=3B82F6&labelColor=111827&label=Forks" alt="Forks"/>
+</a>
+
+<a href="https://github.com/yuvanvishnupandi/Finance_Tracker_APP/commits/main">
+  <img src="https://img.shields.io/github/last-commit/yuvanvishnupandi/Finance_Tracker_APP?style=for-the-badge&color=22C55E&labelColor=111827&label=Last%20Commit" alt="Last Commit"/>
+</a>
+
+</p>
+
+<p align="center">
+
+<a href="https://www.oracle.com/java/">
+  <img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java"/>
+</a>
+
+<a href="https://spring.io/projects/spring-boot">
+  <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot"/>
+</a>
+
+<a href="https://openjfx.io/">
+  <img src="https://img.shields.io/badge/JavaFX-1976D2?style=for-the-badge&logo=openjdk&logoColor=white" alt="JavaFX"/>
+</a>
+
+
+
+<a href="https://deepmind.google/technologies/gemini/">
+  <img src="https://img.shields.io/badge/Google_Gemini-4285F4?style=for-the-badge&logo=googlegemini&logoColor=white" alt="Google Gemini"/>
+</a>
+
+<a href="https://mistral.ai/">
+  <img src="https://img.shields.io/badge/Mistral_AI-FA520F?style=for-the-badge&logo=mistralai&logoColor=white" alt="Mistral AI"/>
+</a>
+
 
 ---
 
@@ -27,23 +60,20 @@
   </tr>
   <tr>
     <td><img src="assets/img3.jpeg" width="400" style="border-radius:8px"/></td>
-    <td><img src="assets/img4.jpeg" width="400" style="border-radius:8px"/></td>
+    <td><img src="assets/img7.jpeg" width="400" style="border-radius:8px"/></td>
   </tr>
   <tr>
     <td><img src="assets/img5.jpeg" width="400" style="border-radius:8px"/></td>
-    <td><img src="assets/img6.jpeg" width="400" style="border-radius:8px"/></td>
+     <td><img src="assets/img6.jpeg" width="400" style="border-radius:8px"/></td>
   </tr>
-  <tr>
-    <td><img src="assets/img7.jpeg" width="400" style="border-radius:8px"/></td>
-    <td><img src="assets/ai_assistant.jpeg" width="400" style="border-radius:8px"/></td>
-  </tr>
+ 
 </table>
 
 </div>
 
 
 ---
-## Key Functionalities
+## What you get
 <div align="center">
 <img src="assets/dashboard.png" alt="Finvora — overview" width="100%" />
 
@@ -67,7 +97,7 @@
 </td>
 <td width="50%" valign="top">
 
-#### 🧠 Bleeding-edge AI features
+#### 🧠 AI features
 
 - **Dedicated AI Assistant** — a conversational AI window that knows your exact balance, transactions, and goals.
 - **Voice-Activated Chat** — inline voice prompting with infinite Google TTS chunking. Just talk to your AI advisor!
@@ -95,22 +125,76 @@ Compile and run the Spring Boot backend server and the JavaFX frontend client. D
 
 <br />
 
-## Tech stack
+## 🚀 Tech Stack
 
-<div align="center">
+<table align="center">
+<tr>
 
-![Java](https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=java&logoColor=white)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat-square&logo=spring-boot&logoColor=white)
-![JavaFX](https://img.shields.io/badge/JavaFX-FF0000?style=flat-square&logo=java&logoColor=white)
-![Maven](https://img.shields.io/badge/Maven-C71A36?style=flat-square&logo=apachemaven&logoColor=white)
-![H2 Database](https://img.shields.io/badge/H2-005C84?style=flat-square&logo=databricks&logoColor=white)
-![Gemini](https://img.shields.io/badge/Gemini-8E75B2?style=flat-square&logo=googlegemini&logoColor=white)
-![OpenAI](https://img.shields.io/badge/OpenAI-10A37F?style=flat-square&logo=openai&logoColor=white)
-![Mistral](https://img.shields.io/badge/Mistral_AI-FA520F?style=flat-square&logo=mistralai&logoColor=white)
+<td align="center" width="180" height="180">
+<a href="https://www.oracle.com/java/">
+<img src="https://skillicons.dev/icons?i=java" width="90"/><br><br>
+<b>Java</b>
+</a>
+</td>
 
-</div>
+<td align="center" width="180" height="180">
+<a href="https://spring.io/projects/spring-boot">
+<img src="https://skillicons.dev/icons?i=spring" width="90"/><br><br>
+<b>Spring Boot</b>
+</a>
+</td>
 
-Frontend built on JavaFX + Maven. Backend on Spring Boot. Multi-LLM inference orchestrating Gemini Vision, OpenAI GPT, and Mistral. Data is stored locally in an embedded H2 database for blazing-fast access.
+<td align="center" width="180" height="180">
+<a href="https://openjfx.io/">
+  <img src="https://skillicons.dev/icons?i=java" width="90"/><br><br>
+  <b>JavaFX</b>
+</a>
+</td>
+
+<td align="center" width="180" height="180">
+<a href="https://maven.apache.org/">
+<img src="https://skillicons.dev/icons?i=maven" width="90"/><br><br>
+<b>Maven</b>
+</a>
+</td>
+
+</tr>
+
+<tr>
+
+<td align="center" width="180" height="180">
+<a href="https://www.h2database.com/">
+<img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/h2database.svg" width="90"/><br><br>
+<b>H2 Database</b>
+</a>
+</td>
+
+<td align="center" width="180" height="180">
+<a href="https://deepmind.google/technologies/gemini/">
+<img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/googlegemini.svg" width="90"/><br><br>
+<b>Gemini</b>
+</a>
+</td>
+
+<td align="center" width="180" height="180">
+<a href="https://openai.com/">
+<img src="https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white"/>
+</a>
+</td>
+
+<td align="center" width="180" height="180">
+<a href="https://mistral.ai/">
+<img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/mistralai.svg" width="90"/><br><br>
+<b>Mistral AI</b>
+</a>
+</td>
+
+</tr>
+</table>
+
+<br>
+
+</p>
 
 <br />
 
